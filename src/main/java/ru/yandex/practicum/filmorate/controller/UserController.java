@@ -29,26 +29,6 @@ public class UserController {
         return List.copyOf(users.values());
     }
 
-    @PostMapping
-    public User createUser(@Valid @RequestBody User user) {
-        if (user.getName() == null || user.getName().isEmpty()) {
-            throw new ValidationException("Имя пользователя не может быть пустым");
-        }
-        for (User registeredUser : users.values()) {
-
-            if (registeredUser.getEmail().equals(user.getEmail())) {
-
-                log.warn("Пользователь с электронной почтой " + user.getEmail()
-                        + " уже зарегистрирован");
-                throw new ValidationException("Пользователь с электронной почтой уже зарегистрирован");
-            }
-        }
-        validateUsers(user);
-        user.setId(generatorId());
-        users.put(user.getId(), user);
-        log.debug("Пользователь новый добавлен: {}", user);
-        return user;
-    }
 
     @PutMapping
     public User updateUser(@Valid @RequestBody User user) {
