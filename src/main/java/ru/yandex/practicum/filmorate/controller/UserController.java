@@ -30,7 +30,7 @@ public class UserController {
     }
 
     @PostMapping
-    public User createUser(@Valid @RequestBody User user){
+    public User createUser(@Valid @RequestBody User user) {
         validateUsers(user);
         user.setId(generatorId());
         users.put(user.getId(), user);
@@ -40,7 +40,6 @@ public class UserController {
 
     @PutMapping
     public User updateUser(@Valid @RequestBody User user) {
-
         validateUsers(user);
         if (users.get(user.getId()) != null) {
             users.replace(user.getId(), user);
