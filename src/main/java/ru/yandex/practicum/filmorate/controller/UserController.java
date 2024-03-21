@@ -31,6 +31,15 @@ public class UserController {
 
     @PostMapping
     public User createUser(@Valid @RequestBody User user) {
+        for (User registeredUser : users.values()) {
+
+            if (registeredUser.getEmail().equals(user.getEmail())) {
+
+                log.warn("Пользователь с электронной почтой " + user.getEmail()
+                        + " уже зарегистрирован");
+                throw new ValidationException("Пользователь с электронной почтой уже зарегистрирован");
+            }
+        }
         validateUsers(user);
         user.setId(generatorId());
         users.put(user.getId(), user);
