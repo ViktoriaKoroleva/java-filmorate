@@ -30,8 +30,7 @@ public class UserController {
     }
 
     @PostMapping
-    public User create(@Valid @RequestBody User user) throws ValidationException {
-
+    public User createUser(@Valid @RequestBody User user){
         validateUsers(user);
         user.setId(generatorId());
         users.put(user.getId(), user);
@@ -40,7 +39,7 @@ public class UserController {
     }
 
     @PutMapping
-    public User update(@Valid @RequestBody User user) throws ValidationException {
+    public User updateUser(@Valid @RequestBody User user) {
 
         validateUsers(user);
         if (users.get(user.getId()) != null) {
