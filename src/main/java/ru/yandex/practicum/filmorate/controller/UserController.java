@@ -31,6 +31,9 @@ public class UserController {
 
     @PostMapping
     public User createUser(@Valid @RequestBody User user) {
+        if (user.getName() == null || user.getName().isEmpty()) {
+            throw new ValidationException("Имя пользователя не может быть пустым");
+        }
         for (User registeredUser : users.values()) {
 
             if (registeredUser.getEmail().equals(user.getEmail())) {
