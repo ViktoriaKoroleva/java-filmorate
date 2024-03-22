@@ -12,6 +12,7 @@ import java.time.LocalDate;
 public class User {
     private Integer id;
 
+    private String name;
     private final LocalDate birthday;
     @NotBlank(message = "Логин не может быть пустым")
     private final String login;
