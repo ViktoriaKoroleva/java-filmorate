@@ -34,32 +34,32 @@ public class FilmController {
 
     @PostMapping
     public Film create(@Valid @RequestBody Film film) throws ValidationException {
-
-        validateFilms(film);
+        if (!isValidFilm(film)) {
+            log.warn("Валидация не пройдена для фильма: {}", film);
+            throw new ValidationException("Фильм не прошел валидацию");
+        }
         film.setId(generatorId());
         films.put(film.getId(), film);
         log.info("Фильм успешно добавлен: {}", film);
-
         return film;
     }
 
     @PutMapping
     public Film updateFilm(@Valid @RequestBody Film film) throws ValidationException {
-        validateFilms(film);
+        if (!isValidFilm(film)) {
+            log.warn("Валидация не пройдена для фильма: {}", film);
+            throw new ValidationException("Фильм не прошел валидацию");
+        }
         if (!films.containsKey(film.getId())) {
-
             log.warn("Невозможно обновить фильм");
             throw new ValidationException("Невозможно обновить фильм");
         }
         films.put(film.getId(), film);
-        log.info("Фильм c id" + film.getId() + " обновлён");
+        log.info("Фильм c id {} обновлён", film.getId());
         return film;
     }
-
-    public void validateFilms(Film film)  {
-        if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
-            log.warn("Валидация не пройдена. Причина - дата релиза фильма");
-            throw new ValidationException("Дата релиза не может быть раньше чем 28.12.1895");
-        }
+    private boolean isValidFilm(Film film) {
+        return film.getReleaseDate().isAfter(LocalDate.of(1895, 12, 27))
+                && film.getReleaseDate().isBefore(LocalDate.now());
     }
 }
