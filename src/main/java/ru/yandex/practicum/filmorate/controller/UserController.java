@@ -48,13 +48,18 @@ public class UserController {
 
     @PutMapping
     public User updateUser(@Valid @RequestBody User user) throws ValidationException {
-        if (!userHashMap.containsKey(user.getId())) {
+        if (user.getName() == null || user.getName().isEmpty()) {
+            user.setName(user.getLogin());
+        }
+
+        if (userHashMap.containsKey(user.getId())) {
             userHashMap.replace(user.getId(), user);
             log.debug("Пользователь успешно обновлен: {}", user);
+            log.info("Пользователь c id " + user.getId() + " обновлён");
+            return user;
+        } else {
+            throw new ValidationException("Пользователь с id " + user.getId() + " не существует");
         }
-        userHashMap.put(user.getId(), user);
-        log.info("Фильм c id" + user.getId() + " обновлён");
-        return user;
     }
 
 }
