@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.Positive;
 import java.time.LocalDate;
 
 /**
@@ -18,7 +18,7 @@ public class Film {
     private final String name;
     @NotBlank(message = "Длина строки описания не должна быть больше 200 символов")
     private final String description;
-    @PositiveOrZero(message = "Продолжительность фильма не может быть отрицательной")
+    @Positive(message = "Продолжительность фильма не может быть отрицательной")
     private final Integer duration;
     private final LocalDate releaseDate;
 }
