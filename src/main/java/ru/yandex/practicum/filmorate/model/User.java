@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @Builder
 public class User {
     private Integer id;
-    @NotBlank(message = "Имя пользователя не может быть пустым")
+
     private String name;
     private final LocalDate birthday;
     @NotBlank(message = "Логин не может быть пустым")

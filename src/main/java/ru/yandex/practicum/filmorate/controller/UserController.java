@@ -31,15 +31,6 @@ public class UserController {
 
     @PostMapping
     public User createUser(@Valid @RequestBody User user) throws ValidationException {
-
-        for (User registeredUser : userHashMap.values()) {
-
-            if (registeredUser.getEmail().equals(user.getEmail())) {
-
-                log.warn("Пользователь с электронной почтой " + user.getEmail()
-                        + " уже зарегистрирован");
-            }
-        }
         user.setId(generatorId());
         userHashMap.put(user.getId(), user);
         log.info("Фильм успешно добавлен: {}", user);
