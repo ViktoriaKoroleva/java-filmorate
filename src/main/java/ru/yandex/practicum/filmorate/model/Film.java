@@ -5,6 +5,7 @@ import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
 
 /**
@@ -16,7 +17,7 @@ public class Film {
     private Integer id;
     @NotBlank(message = "Название фильма не может быть пустым")
     private final String name;
-    @NotBlank(message = "Длина строки описания не должна быть больше 200 символов")
+    @Size(max = 200)
     private final String description;
     @Positive(message = "Продолжительность фильма не может быть отрицательной")
     private final Integer duration;
