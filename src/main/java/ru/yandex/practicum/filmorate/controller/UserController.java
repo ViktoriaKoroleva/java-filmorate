@@ -37,7 +37,7 @@ public class UserController {
             throw new ValidationException("Пользователь уже существует");
         }
 
-        if (user.getName().isBlank()) {
+        if (user.getName().isEmpty()) {
             user.setName(user.getLogin());
         }
         user.setId(generatorId());
