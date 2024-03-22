@@ -58,6 +58,7 @@ public class FilmController {
         log.info("Фильм c id {} обновлён", film.getId());
         return film;
     }
+
     private boolean isValidFilm(Film film) {
         return film.getReleaseDate().isAfter(LocalDate.of(1895, 12, 27))
                 && film.getReleaseDate().isBefore(LocalDate.now());
