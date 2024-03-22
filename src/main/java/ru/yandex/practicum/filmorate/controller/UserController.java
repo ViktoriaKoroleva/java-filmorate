@@ -33,7 +33,7 @@ public class UserController {
     public User createUser(@Valid @RequestBody User user) throws ValidationException {
 
         if (user.getId() == null || !userHashMap.containsKey(user.getId())) {
-            if (user.getName() == null || user.getName().isEmpty()) {
+            if (user.getName() == null || user.getName().isBlank()) {
                 user.setName(user.getLogin());
             }
             user.setId(generatorId());
