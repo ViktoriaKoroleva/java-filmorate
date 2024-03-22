@@ -13,10 +13,10 @@ public class User {
     private Integer id;
 
     private String name;
-    private final LocalDate birthday;
+    private LocalDate birthday;
     @NotBlank(message = "Логин не может быть пустым")
-    private final String login;
+    private String login;
     @NotBlank(message = "Email не может быть пустым")
     @Email(message = "Некорректный формат Email")
-    private final String email;
+    private String email;
 }

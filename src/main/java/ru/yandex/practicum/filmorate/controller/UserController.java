@@ -31,12 +31,14 @@ public class UserController {
 
     @PostMapping
     public User createUser(@Valid @RequestBody User user) throws ValidationException {
-        for (User registeredUser : userHashMap.values()) {
 
-            if (registeredUser.getEmail().equals(user.getEmail())) {
-                log.warn("Пользователь с электронной почтой " + user.getEmail()
-                        + " уже зарегистрирован");
-            }
+        if (userHashMap.containsValue(user)) {
+            log.info("Пользователь уже существует");
+            throw new ValidationException("Пользователь уже существует");
+        }
+
+        if (user.getName() == null || user.getName().isEmpty()) {
+            user.setName(user.getLogin());
         }
         user.setId(generatorId());
         userHashMap.put(user.getId(), user);
