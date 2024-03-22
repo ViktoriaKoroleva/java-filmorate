@@ -16,7 +16,7 @@ public class Film {
     private Integer id;
     @NotBlank(message = "Название фильма не может быть пустым")
     private final String name;
-    @NotBlank(message = "Описание фильма не может быть пустым")
+    @NotBlank(message = "Длина строки описания не должна быть больше 200 символов")
     private final String description;
     @PositiveOrZero(message = "Продолжительность фильма не может быть отрицательной")
     private final Integer duration;
