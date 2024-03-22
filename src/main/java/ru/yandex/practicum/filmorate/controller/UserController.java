@@ -32,20 +32,18 @@ public class UserController {
     @PostMapping
     public User createUser(@Valid @RequestBody User user) throws ValidationException {
 
-        for (User existingUser : userHashMap.values()) {
-            if (existingUser.getId().equals(user.getId())) {
-                log.info("Пользователь с таким ID уже существует");
-                throw new ValidationException("Пользователь с таким ID уже существует");
+        if (user.getId() == null || !userHashMap.containsKey(user.getId())) {
+            if (user.getName() == null || user.getName().isEmpty()) {
+                user.setName(user.getLogin());
             }
+            user.setId(generatorId());
+            userHashMap.put(user.getId(), user);
+            log.info("Пользователь успешно добавлен: {}", user);
+            return user;
+        } else {
+            log.info("Пользователь с таким ID уже существует");
+            throw new ValidationException("Пользователь с таким ID уже существует");
         }
-
-        if (user.getName() == null || user.getName().isEmpty()) {
-            user.setName(user.getLogin());
-        }
-        user.setId(generatorId());
-        userHashMap.put(user.getId(), user);
-        log.info("Пользователь успешно добавлен: {}", user);
-        return user;
     }
 
     @PutMapping
