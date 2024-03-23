@@ -33,7 +33,7 @@ public class FilmController {
     }
 
     @PostMapping
-    public Film create(@Valid @RequestBody Film film) throws ValidationException {
+    public Film create(@Valid @RequestBody Film film) {
         if (!isValidFilm(film)) {
             log.warn("Валидация не пройдена для фильма: {}", film);
             throw new ValidationException("Фильм не прошел валидацию");
@@ -45,7 +45,7 @@ public class FilmController {
     }
 
     @PutMapping
-    public Film updateFilm(@Valid @RequestBody Film film) throws ValidationException {
+    public Film updateFilm(@Valid @RequestBody Film film) {
         if (!isValidFilm(film)) {
             log.warn("Валидация не пройдена для фильма: {}", film);
             throw new ValidationException("Фильм не прошел валидацию");

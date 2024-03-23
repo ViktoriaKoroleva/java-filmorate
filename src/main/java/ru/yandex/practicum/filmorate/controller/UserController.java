@@ -30,7 +30,7 @@ public class UserController {
     }
 
     @PostMapping
-    public User createUser(@Valid @RequestBody User user) throws ValidationException {
+    public User createUser(@Valid @RequestBody User user) {
 
         if (user.getId() == null || !userHashMap.containsKey(user.getId())) {
             if (user.getName() == null || user.getName().isBlank()) {
@@ -47,19 +47,14 @@ public class UserController {
     }
 
     @PutMapping
-    public User updateUser(@Valid @RequestBody User user) throws ValidationException {
-        if (user.getName() == null || user.getName().isEmpty()) {
-            user.setName(user.getLogin());
+    public User updateUser(@Valid @RequestBody User user) {
+        if (!userHashMap.containsKey(user.getId())) {
+            log.warn("Невозможно обновить фильм");
+            throw new ValidationException("Невозможно обновить фильм");
         }
-
-        if (userHashMap.containsKey(user.getId())) {
-            userHashMap.replace(user.getId(), user);
-            log.debug("Пользователь успешно обновлен: {}", user);
-            log.info("Пользователь c id " + user.getId() + " обновлён");
-            return user;
-        } else {
-            throw new ValidationException("Пользователь с id " + user.getId() + " не существует");
-        }
+        userHashMap.put(user.getId(), user);
+        log.info("Фильм c id {} обновлён", user.getId());
+        return user;
     }
 
 }
