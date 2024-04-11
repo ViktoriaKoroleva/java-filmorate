@@ -1,10 +1,12 @@
 package ru.yandex.practicum.filmorate.service.user;
 
+import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.HashSet;
 import java.util.Set;
 
+@Service
 public class UserService {
     private final Set<User> users = new HashSet<>();
 

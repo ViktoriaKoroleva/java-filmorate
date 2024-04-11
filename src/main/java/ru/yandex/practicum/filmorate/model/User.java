@@ -14,7 +14,6 @@ import java.util.Set;
 @Builder
 public class User {
     private Long id;
-
     private String name;
     @Past
     private LocalDate birthday;

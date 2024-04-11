@@ -1,9 +1,11 @@
 package ru.yandex.practicum.filmorate.service.film;
 
+import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.*;
 
+@Service
 public class FilmService {
     private final Map<Integer, Film> films = new HashMap<>();
     private final Map<Integer, Integer> likes = new HashMap<>();

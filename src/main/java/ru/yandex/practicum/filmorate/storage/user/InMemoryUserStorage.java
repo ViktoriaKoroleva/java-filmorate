@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 @Component
 @Slf4j
-public class InMemoryUserStorage implements UserStorage{
+public class InMemoryUserStorage implements UserStorage {
     private final HashSet<User> users = new HashSet<>();
     private long nextId = 0;
 
