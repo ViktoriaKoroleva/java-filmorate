@@ -35,7 +35,7 @@ public class FilmController {
 
     @PostMapping
     public Film create(@Valid @RequestBody Film film) {
-        if (!isValidFilm(film)) {
+        if (!isValidFilms(film)) {
             log.warn("Валидация не пройдена для фильма: {}", film);
             throw new ValidationException("Фильм не прошел валидацию");
         }
@@ -60,7 +60,7 @@ public class FilmController {
         return filmService.getTopFilms();
     }
 
-    private boolean isValidFilm(Film film) {
+    private boolean isValidFilms(Film film) {
         return film.getReleaseDate().isAfter(LocalDate.of(1895, 12, 27))
                 && film.getReleaseDate().isBefore(LocalDate.now());
     }
