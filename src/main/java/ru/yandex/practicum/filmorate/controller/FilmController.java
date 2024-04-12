@@ -18,7 +18,6 @@ import java.util.Map;
 @RequestMapping("/films")
 @Validated
 public class FilmController {
-
     private final Map<Integer, Film> films = new HashMap<>();
     private FilmService filmService;
     private int filmId = 1;
