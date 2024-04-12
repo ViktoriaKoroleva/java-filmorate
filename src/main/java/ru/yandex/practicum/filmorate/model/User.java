@@ -5,6 +5,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Past;
 import java.time.LocalDate;
 import java.util.Set;
 
@@ -13,12 +17,17 @@ import java.util.Set;
 @NoArgsConstructor
 @Builder
 public class User {
-    private Long id;
-    private String email;
-    private LocalDate birthday;
+
     private Set<Long> friends;
-    private String login;
+    private Integer id;
     private String name;
+    @Past
+    private LocalDate birthday;
+    @NotEmpty
+    private String login;
+    @NotBlank(message = "Email не может быть пустым")
+    @Email(message = "Некорректный формат Email")
+    private String email;
 
     public void deleteFriend(long friendId) {
         friends.remove(friendId);

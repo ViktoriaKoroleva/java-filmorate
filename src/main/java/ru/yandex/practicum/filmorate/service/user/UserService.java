@@ -14,9 +14,9 @@ public class UserService {
     private UserStorage userStorage;
 
     public User addUser(User user) {
-        users.add(user);
-        return user;
+        return userStorage.addUser(user);
     }
+
 
     public void addFriendship(Long userId1, Long userId2) {
         User user1 = findUserById(userId1);
