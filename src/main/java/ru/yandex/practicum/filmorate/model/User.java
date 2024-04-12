@@ -19,7 +19,7 @@ import java.util.Set;
 public class User {
 
     private Set<Long> friends;
-    private Integer id;
+    private long id;
     private String name;
     @Past
     private LocalDate birthday;
