@@ -43,7 +43,6 @@ public class FilmController {
         log.info("Фильм успешно добавлен: {}", film);
         return film;
     }
-
     @PostMapping("/{filmId}/like")
     public void likeFilm(@PathVariable int filmId, @RequestParam int userId) {
         filmService.likeFilm(filmId, userId);
@@ -64,3 +63,4 @@ public class FilmController {
                 && film.getReleaseDate().isBefore(LocalDate.now());
     }
 }
+

@@ -24,3 +24,4 @@ public class User {
     private String email;
     private Set<Long> friends;
 }
+
