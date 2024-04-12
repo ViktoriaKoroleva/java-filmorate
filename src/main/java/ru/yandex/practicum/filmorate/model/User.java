@@ -17,7 +17,6 @@ import java.util.Set;
 @NoArgsConstructor
 @Builder
 public class User {
-
     private Set<Long> friends;
     private long id;
     private String name;

@@ -17,10 +17,9 @@ public class UserService {
         return userStorage.addUser(user);
     }
 
-
     public void addFriendship(Long userId1, Long userId2) {
-        User user1 = findUserById(userId1);
-        User user2 = findUserById(userId2);
+        User user1 = userStorage.getUserById(userId1);
+        User user2 = userStorage.getUserById(userId2);
         if (user1 != null && user2 != null) {
             user1.getFriends().add(userId2);
             user2.getFriends().add(userId1);
@@ -42,8 +41,8 @@ public class UserService {
     }
 
     public Set<Long> findMutualFriends(Long userId1, Long userId2) {
-        User user1 = findUserById(userId1);
-        User user2 = findUserById(userId2);
+        User user1 = userStorage.getUserById(userId1);
+        User user2 = userStorage.getUserById(userId2);
         if (user1 != null && user2 != null) {
             Set<Long> mutualFriends = new HashSet<>(user1.getFriends());
             mutualFriends.retainAll(user2.getFriends());
@@ -56,12 +55,4 @@ public class UserService {
         return userStorage.findMutualFriends(userId, otherUserId);
     }
 
-    private User findUserById(Long userId) {
-        for (User user : users) {
-            if (user.getId().equals(userId)) {
-                return user;
-            }
-        }
-        return null;
-    }
 }
