@@ -19,5 +19,9 @@ public class User {
     private Set<Long> friends;
     private String login;
     private String name;
+
+    public void deleteFriend(long friendId) {
+        friends.remove(friendId);
+    }
 }
 

@@ -6,13 +6,13 @@ import java.util.List;
 
 public interface FilmStorage {
 
-    List<Film> findAll();
+    Film findById(long userId);
 
-    Film updateFilm(long id, Film film);
+    Film updateFilm(Film film);
 
     Film create(Film film);
 
-    boolean removeFilm(long id);
+    Film removeLike(long filmId, long userId);
 
     List<Film> getTopFilms(int count);
 

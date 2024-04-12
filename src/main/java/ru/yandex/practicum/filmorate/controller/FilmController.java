@@ -8,7 +8,6 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,14 +33,7 @@ public class FilmController {
 
     @PostMapping
     public Film create(@Valid @RequestBody Film film) {
-        if (!isValidFilms(film)) {
-            log.warn("Валидация не пройдена для фильма: {}", film);
-            throw new ValidationException("Фильм не прошел валидацию");
-        }
-        film.setId(generatorId());
-        films.put(film.getId(), film);
-        log.info("Фильм успешно добавлен: {}", film);
-        return film;
+        return filmService.create(film);
     }
 
     @PostMapping("/{filmId}/like")
@@ -50,8 +42,16 @@ public class FilmController {
     }
 
     @DeleteMapping("/{filmId}/like")
-    public void removeLike(@PathVariable int filmId) {
-        filmService.removeLike(filmId);
+    public void removeLike(@PathVariable int filmId, @PathVariable long userId) {
+        filmService.removeLike(filmId, userId);
+    }
+    @GetMapping("/{id}")
+    public Film findById(@PathVariable long id) {
+        return filmService.findById(id);
+    }
+    @PutMapping
+    public Film updateFilm(@Valid @RequestBody Film film) throws ValidationException {
+        return filmService.updateFilm(film);
     }
 
     @GetMapping("/top")
@@ -59,9 +59,5 @@ public class FilmController {
         return filmService.getTopFilms();
     }
 
-    private boolean isValidFilms(Film film) {
-        return film.getReleaseDate().isAfter(LocalDate.of(1895, 12, 27))
-                && film.getReleaseDate().isBefore(LocalDate.now());
-    }
 }
 

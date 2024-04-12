@@ -16,11 +16,15 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 public class Film {
-    private int id;
+    private long id;
     private String name;
     private String description;
     private LocalDate releaseDate;
     private Set<Integer> likes;
     private Long duration;
     private int like;
+
+    public void removeLike(long userId) {
+        likes.remove(userId);
+    }
 }

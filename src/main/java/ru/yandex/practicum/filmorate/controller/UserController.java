@@ -7,16 +7,14 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.user.UserService;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import javax.validation.Valid;
+import java.util.List;
 
 @Slf4j
 @RestController
 @RequestMapping("/users")
 @Validated
 public class UserController {
-    private final Map<Integer, User> userHashMap = new HashMap<>();
     private int userId = 1;
 
     private final UserService userService;
@@ -36,13 +34,18 @@ public class UserController {
         userService.addFriendship(userId1, userId2);
     }
 
+    @PutMapping
+    public User update(@Valid @RequestBody User user) {
+        return userService.update(user);
+    }
+
     @DeleteMapping("/{userId1}/friends/{userId2}")
     public void removeFriendship(@PathVariable Long userId1, @PathVariable Long userId2) {
         userService.removeFriend(userId1, userId2);
     }
 
     @GetMapping("/{userId1}/mutual-friends/{userId2}")
-    public Set<Long> findMutualFriends(@PathVariable Long userId1, @PathVariable Long userId2) {
+    public List<User> findMutualFriends(@PathVariable long userId1, @PathVariable long userId2) {
         return userService.findMutualFriends(userId1, userId2);
     }
 }
