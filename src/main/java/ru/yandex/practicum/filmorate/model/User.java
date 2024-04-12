@@ -5,10 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Past;
 import java.time.LocalDate;
 import java.util.Set;
 
@@ -19,9 +15,9 @@ import java.util.Set;
 public class User {
     private Long id;
     private String email;
-    private String login;
-    private String name;
     private LocalDate birthday;
     private Set<Long> friends;
+    private String login;
+    private String name;
 }
 
