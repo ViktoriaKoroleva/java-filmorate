@@ -45,10 +45,12 @@ public class FilmController {
     public void removeLike(@PathVariable int filmId, @PathVariable long userId) {
         filmService.removeLike(filmId, userId);
     }
+
     @GetMapping("/{id}")
     public Film findById(@PathVariable long id) {
         return filmService.findById(id);
     }
+
     @PutMapping
     public Film updateFilm(@Valid @RequestBody Film film) throws ValidationException {
         return filmService.updateFilm(film);
