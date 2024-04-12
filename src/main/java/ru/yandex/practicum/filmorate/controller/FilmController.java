@@ -36,12 +36,12 @@ public class FilmController {
         return filmService.create(film);
     }
 
-    @PostMapping("/{filmId}/like")
+    @PostMapping("/films/{filmId}/like")
     public void likeFilm(@PathVariable int filmId, @RequestParam int userId) {
         filmService.likeFilm(filmId, userId);
     }
 
-    @DeleteMapping("/{filmId}/like")
+    @DeleteMapping("/films/{filmId}/likes/{userId}")
     public void removeLike(@PathVariable int filmId, @PathVariable long userId) {
         filmService.removeLike(filmId, userId);
     }
