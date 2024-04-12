@@ -23,6 +23,7 @@ public class FilmService {
 
         return filmStorage.create(film);
     }
+
     public void likeFilm(int filmId, int userId) {
         if (!films.containsKey(filmId)) {
             throw new IllegalArgumentException("Фильм с указанным ID не существует");
@@ -47,6 +48,7 @@ public class FilmService {
         isValidFilm(film);
         return filmStorage.updateFilm(film);
     }
+
     public List<Film> getTopFilms() {
         Map<Film, Integer> filmLikesCount = new HashMap<>();
         for (Integer filmId : likes.keySet()) {
@@ -69,6 +71,7 @@ public class FilmService {
 
         return topFilms;
     }
+
     private boolean isValidFilm(Film film) {
         return film.getReleaseDate().isAfter(LocalDate.of(1895, 12, 27))
                 && film.getReleaseDate().isBefore(LocalDate.now());
