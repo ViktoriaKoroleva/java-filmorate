@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -37,15 +36,8 @@ public class FilmService {
     public List<Film> getTopRatedFilms(int count) {
         List<Film> films = new ArrayList<>(filmStorage.getFilms().values());
 
-        List<Film> sortedFilms = films.stream()
-                .sorted(Comparator.comparingInt(f -> -f.getLikes().size()))
-                .collect(Collectors.toList());
+        List<Film> sortedFilms = films.stream().sorted(Comparator.comparingInt(f -> -f.getLikes().size())).collect(Collectors.toList());
 
         return sortedFilms.subList(0, Math.min(count, sortedFilms.size()));
-    }
-
-    private boolean isValidFilm(Film film) {
-        return film.getReleaseDate().isAfter(LocalDate.of(1895, 12, 27))
-                && film.getReleaseDate().isBefore(LocalDate.now());
     }
 }
