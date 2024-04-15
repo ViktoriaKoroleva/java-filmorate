@@ -10,6 +10,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Past;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -17,7 +18,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Builder
 public class User {
-    private Set<Long> friends;
+    private List<Integer> friends;
     private long id;
     private String name;
     @Past
@@ -27,9 +28,5 @@ public class User {
     @NotBlank(message = "Email не может быть пустым")
     @Email(message = "Некорректный формат Email")
     private String email;
-
-    public void deleteFriend(long friendId) {
-        friends.remove(friendId);
-    }
 }
 

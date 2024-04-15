@@ -1,75 +1,47 @@
 package ru.yandex.practicum.filmorate.service.film;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
-import ru.yandex.practicum.filmorate.validation.ValidationException;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 public class FilmService {
-    private final Map<Integer, Film> films = new HashMap<>();
-    private final Map<Integer, Integer> likes = new HashMap<>();
+    private final FilmStorage filmStorage;
+    private final UserStorage userStorage;
 
-    private FilmStorage filmStorage;
-
-
-    public Film create(Film film) {
-        isValidFilm(film);
-
-        return filmStorage.create(film);
+    @Autowired
+    public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
+        this.filmStorage = filmStorage;
+        this.userStorage = userStorage;
     }
 
-    public void likeFilm(int filmId, int userId) {
-        if (!films.containsKey(filmId)) {
-            throw new IllegalArgumentException("Фильм с указанным ID не существует");
-        }
 
-        if (likes.containsKey(filmId)) {
-            throw new IllegalStateException("Пользователь уже поставил лайк этому фильму");
-        }
-
-        likes.put(filmId, userId);
-    }
-
-    public Film removeLike(long filmId, long userId) {
-        return filmStorage.removeLike(filmId, userId);
+    public HashMap<Integer, Film> getFilms() {
+        return filmStorage.getFilms();
     }
 
     public Film findById(long filmId) {
-        return filmStorage.findById(filmId);
+        return filmStorage.getFilmById(filmId);
     }
 
-    public Film updateFilm(Film film) throws ValidationException {
-        isValidFilm(film);
-        return filmStorage.updateFilm(film);
-    }
 
-    public List<Film> getTopFilms() {
-        Map<Film, Integer> filmLikesCount = new HashMap<>();
-        for (Integer filmId : likes.keySet()) {
-            Film film = films.get(filmId);
-            filmLikesCount.put(film, filmLikesCount.getOrDefault(film, 0) + 1);
-        }
+    public List<Film> getTopRatedFilms(int count) {
+        List<Film> films = new ArrayList<>(filmStorage.getFilms().values());
 
-        List<Map.Entry<Film, Integer>> sortedEntries = new ArrayList<>(filmLikesCount.entrySet());
-        sortedEntries.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
+        List<Film> sortedFilms = films.stream()
+                .sorted(Comparator.comparingInt(f -> -f.getLikes().size()))
+                .collect(Collectors.toList());
 
-        List<Film> topFilms = new ArrayList<>();
-        int count = 0;
-        for (Map.Entry<Film, Integer> entry : sortedEntries) {
-            topFilms.add(entry.getKey());
-            count++;
-            if (count == 10) {
-                break;
-            }
-        }
-
-        return topFilms;
+        return sortedFilms.subList(0, Math.min(count, sortedFilms.size()));
     }
 
     private boolean isValidFilm(Film film) {

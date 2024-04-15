@@ -7,7 +7,6 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.validation.ValidationException;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -23,7 +22,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
 
     @Override
-    public Film findById(long userId) {
+    public Film getFilmById(long userId) {
         for (Map.Entry<Long, Film> entry : films.entrySet()) {
             if (entry.getKey() == userId) {
                 return entry.getValue();
@@ -46,29 +45,32 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film create(Film film) {
         film.setId(generateId());
-        films.put(film.getId(), film);
+        films.put((long) film.getId(), film);
         log.info("Фильм успешно добавлен: {}", film);
         return film;
     }
 
     @Override
-    public Film removeLike(long filmId, long userId) {
-        Film film = findById(userId);
+    public Film removeLike(int filmId, int userId) {
+        Film film = getFilmById(userId);
         userStorage.getUserById(userId);
-        film.removeLike(userId);
+        userStorage.removeFriend(userId, filmId);
         return updateFilm(film);
     }
 
     @Override
     public List<Film> getTopFilms(int count) {
-
-        List<Film> allFilms = getTopFilms(count);
-        allFilms.sort(Comparator.comparingInt(Film::getLike).reversed());
-        List<Film> bestFilms = allFilms.stream()
-                .limit(count)
-                .collect(Collectors.toList());
-        return bestFilms;
+        List<Film> allFilms = new ArrayList<>(films.values());
+        Collections.sort(allFilms, (film1, film2) -> Integer.compare(film2.getLikes().size(), film1.getLikes().size()));
+        return allFilms.subList(0, Math.min(count, allFilms.size()));
     }
 
-
+    @Override
+    public HashMap<Integer, Film> getFilms() {
+        HashMap<Integer, Film> filmMap = new HashMap<>();
+        for (Map.Entry<Long, Film> entry : films.entrySet()) {
+            filmMap.put(entry.getValue().getId(), entry.getValue());
+        }
+        return filmMap;
+    }
 }

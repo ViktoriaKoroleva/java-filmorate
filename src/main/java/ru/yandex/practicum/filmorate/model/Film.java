@@ -20,8 +20,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Builder
 public class Film {
-    private long id;
-
+    private int id;
     @NotBlank(message = "Название фильма не может быть пустым")
     private String name;
     @Size(min = 1, max = 200)
@@ -31,10 +30,5 @@ public class Film {
     @NotNull
     private LocalDate releaseDate;
     private Set<Integer> likes;
-    private int like;
 
-
-    public void removeLike(long userId) {
-        likes.remove(userId);
-    }
 }
