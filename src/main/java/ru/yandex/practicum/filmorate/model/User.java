@@ -11,7 +11,6 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Past;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Set;
 
 @Data
 @AllArgsConstructor
