@@ -12,9 +12,6 @@ import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.Set;
 
-/**
- * Film
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
