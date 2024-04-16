@@ -55,8 +55,8 @@ public class UserController {
         return userService.removeFriend(userId1, userId2);
     }
 
-    @GetMapping("/{userId1}/friends/mutual/{userId2}")
-    public List<User> findMutualFriends(@PathVariable int userId1, @PathVariable int userId2) {
-        return userService.findMutualFriends(userId1, userId2);
+    @GetMapping("/{userId1}/friends/common/{friendId}")
+    public List<User> findMutualFriends(@PathVariable int userId1, @PathVariable int friendId) {
+        return userService.findMutualFriends(userId1, friendId);
     }
 }
