@@ -7,31 +7,32 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 public class FilmServiceImpl implements FilmService {
     private final FilmStorage filmStorage;
-    private int filmId = 1;
-
-    private int generateId() {
-        return filmId++;
-    }
 
     @Override
     public Film create(Film film) {
-        return filmStorage.create(film);
+        filmStorage.create(film);
+        return film;
     }
 
     @Override
     public Film updateFilm(Film film) {
-        return filmStorage.updateFilm(film);
+        filmStorage.updateFilm(film);
+        return film;
     }
 
     @Override
     public Film getFilmById(long userId) {
         return filmStorage.getFilmById(userId);
+    }
+
+    @Override
+    public void removeLike(int filmId, int userId) {
+        filmStorage.removeLike(filmId, userId);
     }
 
     @Autowired
@@ -44,16 +45,18 @@ public class FilmServiceImpl implements FilmService {
         return filmStorage.getFilms();
     }
 
+    @Override
+    public List<Film> findAll() {
+        return filmStorage.findAll();
+    }
+
     public Film findById(long filmId) {
         return filmStorage.getFilmById(filmId);
     }
 
-
+    @Override
     public List<Film> getTopRatedFilms(int count) {
-        List<Film> films = new ArrayList<>(filmStorage.getFilms().values());
-
-        List<Film> sortedFilms = films.stream().sorted(Comparator.comparingInt(f -> -f.getLikes().size())).collect(Collectors.toList());
-
-        return sortedFilms.subList(0, Math.min(count, sortedFilms.size()));
+        return filmStorage.getTopRatedFilms(count);
     }
+
 }

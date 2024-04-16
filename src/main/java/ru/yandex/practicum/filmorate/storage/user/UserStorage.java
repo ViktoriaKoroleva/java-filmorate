@@ -16,7 +16,5 @@ public interface UserStorage {
 
     User createUser(User user);
 
-    List<User> getUsers();
-
     User getUser(int id);
 }

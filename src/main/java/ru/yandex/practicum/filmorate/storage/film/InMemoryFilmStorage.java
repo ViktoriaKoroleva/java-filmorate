@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.validation.ValidationException;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -27,6 +28,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         log.info("Фильм успешно добавлен: {}", film);
         return film;
     }
+
     @Override
     public Film getFilmById(long userId) {
         for (Map.Entry<Long, Film> entry : films.entrySet()) {
@@ -57,10 +59,11 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> getTopFilms(int count) {
-        List<Film> allFilms = new ArrayList<>(films.values());
-        Collections.sort(allFilms, (film1, film2) -> Integer.compare(film2.getLikes().size(), film1.getLikes().size()));
-        return allFilms.subList(0, Math.min(count, allFilms.size()));
+    public List<Film> getTopRatedFilms(int count) {
+        return films.values().stream()
+                .sorted((film1, film2) -> Integer.compare(film2.getLike().size(), film1.getLike().size()))
+                .limit(count)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -71,6 +74,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         }
         return filmMap;
     }
+
     @Override
     public List<Film> findAll() {
         log.info("Фильмов в коллекции: {}", films.size());

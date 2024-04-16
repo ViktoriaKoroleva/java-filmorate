@@ -26,6 +26,6 @@ public class Film {
     private Long duration;
     @NotNull
     private LocalDate releaseDate;
-    private Set<Integer> likes;
+    private Set<Integer> like;
 
 }

@@ -15,7 +15,7 @@ public interface FilmStorage {
 
     Film removeLike(int filmId, int userId);
 
-    List<Film> getTopFilms(int count);
+    List<Film> getTopRatedFilms(int count);
 
     HashMap<Integer, Film> getFilms();
 
