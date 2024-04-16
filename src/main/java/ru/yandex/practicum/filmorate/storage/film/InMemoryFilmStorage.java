@@ -20,7 +20,13 @@ public class InMemoryFilmStorage implements FilmStorage {
         return filmId++;
     }
 
-
+    @Override
+    public Film create(Film film) {
+        film.setId(generateId());
+        films.put((long) film.getId(), film);
+        log.info("Фильм успешно добавлен: {}", film);
+        return film;
+    }
     @Override
     public Film getFilmById(long userId) {
         for (Map.Entry<Long, Film> entry : films.entrySet()) {
@@ -40,14 +46,6 @@ public class InMemoryFilmStorage implements FilmStorage {
             }
         }
         return null;
-    }
-
-    @Override
-    public Film create(Film film) {
-        film.setId(generateId());
-        films.put((long) film.getId(), film);
-        log.info("Фильм успешно добавлен: {}", film);
-        return film;
     }
 
     @Override
@@ -72,5 +70,10 @@ public class InMemoryFilmStorage implements FilmStorage {
             filmMap.put(entry.getValue().getId(), entry.getValue());
         }
         return filmMap;
+    }
+    @Override
+    public List<Film> findAll() {
+        log.info("Фильмов в коллекции: {}", films.size());
+        return List.copyOf(films.values());
     }
 }

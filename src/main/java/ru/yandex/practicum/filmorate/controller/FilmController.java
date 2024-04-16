@@ -4,10 +4,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.validation.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.service.film.FilmService;
+import ru.yandex.practicum.filmorate.service.film.FilmServiceImpl;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
@@ -19,12 +20,16 @@ import java.util.List;
 @Validated
 public class FilmController {
     private final FilmStorage filmStorage;
-    private final FilmService filmService;
+    private final FilmServiceImpl filmServiceImpl;
 
     @Autowired
-    public FilmController(FilmStorage filmStorage, FilmService filmService) {
+    public FilmController(FilmStorage filmStorage, FilmServiceImpl filmServiceImpl) {
         this.filmStorage = filmStorage;
-        this.filmService = filmService;
+        this.filmServiceImpl = filmServiceImpl;
+    }
+    @GetMapping("/{userId}")
+    public Film getFilmById(@PathVariable int userId) {
+        return filmStorage.getFilmById(userId);
     }
 
     @PostMapping
@@ -39,13 +44,13 @@ public class FilmController {
 
     @GetMapping("/top")
     public List<Film> getTopRatedFilms(@RequestParam(defaultValue = "10") int count) {
-        return filmService.getTopRatedFilms(count);
+        return filmServiceImpl.getTopRatedFilms(count);
     }
 
     @GetMapping
     public List<Film> getAllFilms() {
-        if (!filmService.getFilms().isEmpty()) {
-            List<Film> filmList = new ArrayList<>(filmService.getFilms().values());
+        if (!filmServiceImpl.getFilms().isEmpty()) {
+            List<Film> filmList = new ArrayList<>(filmServiceImpl.getFilms().values());
             return filmList;
         } else {
             log.info("Список фильмов пуст");
@@ -60,7 +65,7 @@ public class FilmController {
 
     @GetMapping("/{id}")
     public Film findById(@PathVariable long id) {
-        return filmService.findById(id);
+        return filmServiceImpl.findById(id);
     }
 
 

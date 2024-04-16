@@ -18,4 +18,6 @@ public interface FilmStorage {
     List<Film> getTopFilms(int count);
 
     HashMap<Integer, Film> getFilms();
+
+    List<Film> findAll();
 }
