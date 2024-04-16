@@ -16,9 +16,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User createUser(User user){
+    public User createUser(User user) {
         return userStorage.createUser(user);
     }
+
     public User addFriendship(int userId1, int userId2) {
         User user1 = userStorage.getUserById(userId1);
         User user2 = userStorage.getUserById(userId2);

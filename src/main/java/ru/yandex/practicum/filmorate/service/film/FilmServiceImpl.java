@@ -40,7 +40,6 @@ public class FilmServiceImpl implements FilmService {
         this.filmStorage = filmStorage;
     }
 
-
     public HashMap<Integer, Film> getFilms() {
         return filmStorage.getFilms();
     }
