@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.validation.ValidationException;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -23,38 +24,11 @@ public class FilmService {
         return film;
     }
 
-    public Film updateFilm(Film film) {
-        filmStorage.updateFilm(film);
-        return film;
-    }
-
-    public void removeLike(int filmId, int userId) {
-        filmStorage.removeLike(filmId, userId);
-    }
-
-    public HashMap<Integer, Film> getFilms() {
-        return filmStorage.getFilms();
-    }
-
-
-    public List<Film> findAll() {
-        return filmStorage.findAll();
-    }
-
-    public Film findById(long filmId) {
-        return filmStorage.getFilmById(filmId);
-    }
-
-
-    public List<Film> getTopRatedFilms(int count) {
-        return filmStorage.getTopRatedFilms(count);
-    }
-
     public Film addLike(Integer filmId, Integer userId) {
         if (!userStorage.isUserExist(userId)) {
             throw new ValidationException("Нет пользователя с таким id.");
         }
-        Film film = filmStorage.getFilmById(filmId);
+        Film film = filmStorage.getById(filmId);
         film.getLike().add(userId);
         log.info("Добавлен лайк фильму: {} от пользователя c id: {}.", film.getName(), userId);
         return film;
@@ -64,9 +38,34 @@ public class FilmService {
         if (!userStorage.isUserExist(userId)) {
             throw new ValidationException("Нет пользователя с таким id.");
         }
-        Film film = filmStorage.getFilmById(filmId);
+        Film film = filmStorage.getById(filmId);
         film.getLike().remove(userId);
         log.info("Удален лайк фильму: {} от пользователя c id: {}.", film.getName(), userId);
         return film;
+    }
+
+    public Set<Film> getFilms() {
+        return filmStorage.getAll();
+    }
+
+    public void deleteById(Integer filmId) {
+        filmStorage.deleteById(filmId);
+    }
+
+    public Film getById(Integer filmId) {
+        return filmStorage.getById(filmId);
+    }
+
+    public Film update(Film film) {
+        return filmStorage.update(film);
+    }
+
+    public List<Film> fetchTopRatedFilms(int filmsCount) {
+        int popularCount = (filmsCount > 0) ? filmsCount : 10;
+        return filmStorage.getAll().stream()
+                .sorted(Comparator.comparingInt((Film f) -> f.getLike().size()).reversed())
+                .limit(popularCount)
+                .collect(Collectors.toList());
+
     }
 }

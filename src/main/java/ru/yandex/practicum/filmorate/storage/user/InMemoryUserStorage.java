@@ -27,13 +27,6 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User removeFriend(int userId1, int userId2) {
-        getById(userId1).getFriends().remove(userId2);
-        getById(userId2).getFriends().remove(userId1);
-        return getById(userId1);
-    }
-
-    @Override
     public User createUser(User user) {
         if (users.contains(user)) {
             throw new ValidationException("Такой пользователь уже существует.");
@@ -50,6 +43,11 @@ public class InMemoryUserStorage implements UserStorage {
         users.add(user);
         log.info("Пользователь {} добавлен.", user);
         return user;
+    }
+
+    @Override
+    public Set<User> getAll() {
+        return users;
     }
 
     @Override

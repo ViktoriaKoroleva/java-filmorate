@@ -2,14 +2,16 @@ package ru.yandex.practicum.filmorate.storage.user;
 
 import ru.yandex.practicum.filmorate.model.User;
 
+import java.util.Set;
+
 
 public interface UserStorage {
 
     User updateUser(User user);
 
-    User removeFriend(int userId1, int userId2);
-
     User createUser(User user);
+
+    Set<User> getAll();
 
     boolean isUserExist(Integer id);
 

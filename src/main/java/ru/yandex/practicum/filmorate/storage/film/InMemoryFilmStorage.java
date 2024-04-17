@@ -3,81 +3,60 @@ package ru.yandex.practicum.filmorate.storage.film;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.validation.ValidationException;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.HashSet;
+import java.util.Set;
 
-@Component
 @Slf4j
+@Component
 public class InMemoryFilmStorage implements FilmStorage {
 
-    private final Map<Long, Film> films = new HashMap<>();
-    private int filmId = 1;
-    private UserStorage userStorage;
+    private final Set<Film> films = new HashSet<>();
+    private int id = 1;
 
-    private int generateId() {
-        return filmId++;
+    private int incrementId() {
+        return id++;
     }
 
     @Override
     public Film create(Film film) {
-        film.setId(generateId());
-        films.put((long) film.getId(), film);
-        log.info("Фильм успешно добавлен: {}", film);
+        if (films.contains(film)) {
+            throw new ValidationException("Такой фильм уже существует.");
+        }
+        film.setId(incrementId());
+        films.add(film);
+        log.info("Фильм {} добавлен.", film.getName());
         return film;
     }
 
     @Override
-    public Film getFilmById(long userId) {
-        for (Map.Entry<Long, Film> entry : films.entrySet()) {
-            if (entry.getKey() == userId) {
-                return entry.getValue();
-            }
+    public Film update(Film film) {
+        if (!films.contains(film)) {
+            throw new ValidationException("Такого фильма не существует.");
         }
-        throw new ValidationException("Film not found for id: " + userId);
+        films.add(film);
+        log.info("Фильм {} обновлен.", film);
+        return film;
     }
 
     @Override
-    public Film updateFilm(Film film) {
-        for (Map.Entry<Long, Film> entry : films.entrySet()) {
-            if (entry.getValue().equals(film)) {
-                films.put(entry.getKey(), film);
-                return film;
-            }
-        }
-        return null;
+    public Set<Film> getAll() {
+        return films;
     }
 
     @Override
-    public Film removeLike(int filmId, int userId) {
-        Film film = getFilmById(userId);
-        userStorage.getById(userId);
-        userStorage.removeFriend(userId, filmId);
-        return updateFilm(film);
+    public Film getById(Integer id) {
+        return films.stream()
+                .filter(film -> film.getId().equals(id))
+                .findFirst()
+                .orElseThrow(() -> new ValidationException("Нет фильма с таким id."));
     }
 
     @Override
-    public List<Film> getTopRatedFilms(int count) {
-        return films.values().stream()
-                .sorted((film1, film2) -> Integer.compare(film2.getLike().size(), film1.getLike().size()))
-                .limit(count)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public HashMap<Integer, Film> getFilms() {
-        HashMap<Integer, Film> filmMap = new HashMap<>();
-        for (Map.Entry<Long, Film> entry : films.entrySet()) {
-            filmMap.put(entry.getValue().getId(), entry.getValue());
-        }
-        return filmMap;
-    }
-
-    @Override
-    public List<Film> findAll() {
-        log.info("Фильмов в коллекции: {}", films.size());
-        return List.copyOf(films.values());
+    public void deleteById(Integer id) {
+        Film filmToRemove = getById(id);
+        films.remove(filmToRemove);
+        log.info("Фильм {} удален.", filmToRemove.getName());
     }
 }

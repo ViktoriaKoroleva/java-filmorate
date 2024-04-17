@@ -5,7 +5,9 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,12 +31,16 @@ public class UserService {
         return userStorage.updateUser(user);
     }
 
-    public User removeFriend(int userId1, int userId2) {
-        return userStorage.removeFriend(userId1, userId2);
+    public User removeFriend(int userId1, int friendId) {
+        getById(userId1).getFriends().remove(friendId);
+        getById(friendId).getFriends().remove(userId1);
+        return getById(userId1);
     }
 
-    public List<User> getUserFriends(int userId) {
-        return null;
+    public List<User> getUserFriends(int id) {
+        return getById(id).getFriends().stream()
+                .map(this::getById)
+                .collect(Collectors.toList());
     }
 
     public User getById(int userId) {
@@ -45,10 +51,21 @@ public class UserService {
         userStorage.deleteById(userId);
     }
 
+    public Set<User> getAll() {
+        return userStorage.getAll();
+    }
+
     public List<User> getAllFriends(Integer userId) {
         return getById(userId).getFriends().stream()
                 .map(this::getById)
                 .collect(Collectors.toList());
+
+    }
+
+    public List<User> findCommonFriends(Integer userId, Integer friendId) {
+        Set<Integer> mutualFriends = new HashSet<>(getById(userId).getFriends());
+        mutualFriends.retainAll(getById(friendId).getFriends());
+        return mutualFriends.stream().map(this::getById).collect(Collectors.toList());
 
     }
 }
