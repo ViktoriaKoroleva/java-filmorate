@@ -3,8 +3,8 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.service.film.FilmService;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.film.FilmService;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -35,7 +35,7 @@ public class FilmController {
 
     @GetMapping
     public Set<Film> getAll() {
-        return filmService.getFilms();
+        return filmService.getAll();
     }
 
     @PostMapping

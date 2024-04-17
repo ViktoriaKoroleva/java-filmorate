@@ -45,11 +45,6 @@ public class UserController {
         return userService.addFriendship(id, friendId);
     }
 
-    @PostMapping("/{userId1}/friends/{frienId}")
-    public User addFriendship(@PathVariable Integer userId1, @PathVariable Integer frienId) {
-        return userService.addFriendship(userId1, frienId);
-    }
-
     @DeleteMapping("/{userId1}/friends/{friendId}")
     public User removeFriendship(@PathVariable Integer userId1, @PathVariable Integer friendId) {
         return userService.removeFriend(userId1, friendId);
@@ -62,7 +57,6 @@ public class UserController {
 
     @GetMapping("/{userId}/friends/common/{friendId}")
     public List<User> findCommonFriends(@PathVariable Integer userId, @PathVariable Integer friendId) {
-        log.info("Обработан GET user {} mutual friends запрос.", userId);
         return userService.findCommonFriends(userId, friendId);
     }
 }

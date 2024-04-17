@@ -8,20 +8,40 @@ import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.validation.ValidationException;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-@Service
 @Slf4j
+@Service
 @RequiredArgsConstructor
 public class FilmService {
-    private final FilmStorage filmStorage;
+
     private final UserStorage userStorage;
+    private final FilmStorage filmStorage;
 
 
     public Film create(Film film) {
-        filmStorage.create(film);
-        return film;
+
+        return filmStorage.create(film);
+    }
+
+    public Film update(Film film) {
+
+        return filmStorage.update(film);
+    }
+
+    public Set<Film> getAll() {
+        return filmStorage.getAll();
+    }
+
+    public Film getById(Integer id) {
+        return filmStorage.getById(id);
+    }
+
+    public void deleteById(Integer id) {
+        filmStorage.deleteById(id);
     }
 
     public Film addLike(Integer filmId, Integer userId) {
@@ -30,7 +50,6 @@ public class FilmService {
         }
         Film film = filmStorage.getById(filmId);
         film.getLike().add(userId);
-        log.info("Добавлен лайк фильму: {} от пользователя c id: {}.", film.getName(), userId);
         return film;
     }
 
@@ -40,24 +59,7 @@ public class FilmService {
         }
         Film film = filmStorage.getById(filmId);
         film.getLike().remove(userId);
-        log.info("Удален лайк фильму: {} от пользователя c id: {}.", film.getName(), userId);
         return film;
-    }
-
-    public Set<Film> getFilms() {
-        return filmStorage.getAll();
-    }
-
-    public void deleteById(Integer filmId) {
-        filmStorage.deleteById(filmId);
-    }
-
-    public Film getById(Integer filmId) {
-        return filmStorage.getById(filmId);
-    }
-
-    public Film update(Film film) {
-        return filmStorage.update(film);
     }
 
     public List<Film> fetchTopRatedFilms(int filmsCount) {
@@ -66,6 +68,5 @@ public class FilmService {
                 .sorted(Comparator.comparingInt((Film f) -> f.getLike().size()).reversed())
                 .limit(popularCount)
                 .collect(Collectors.toList());
-
     }
 }
