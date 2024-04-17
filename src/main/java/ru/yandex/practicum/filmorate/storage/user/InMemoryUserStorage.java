@@ -13,6 +13,7 @@ import java.util.*;
 public class InMemoryUserStorage implements UserStorage {
     private final Set<User> users = new HashSet<>();
     private int nextId = 1;
+
     private int generateId() {
         return nextId++;
     }

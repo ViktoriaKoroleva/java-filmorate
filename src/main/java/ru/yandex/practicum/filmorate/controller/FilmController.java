@@ -50,6 +50,7 @@ public class FilmController {
     public Film findById(@PathVariable long id) {
         return filmService.findById(id);
     }
+
     @PutMapping("/{filmId}/like/{userId}")
     public Film addLike(@PathVariable Integer filmId, @PathVariable Integer userId) {
         log.info("Обработан PUT film {} like запрос.", filmId);
