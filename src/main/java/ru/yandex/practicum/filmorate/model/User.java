@@ -18,7 +18,7 @@ import java.util.List;
 @Builder
 public class User {
     private List<Integer> friends;
-    private long id;
+    private Integer id;
     private String name;
     @Past
     private LocalDate birthday;

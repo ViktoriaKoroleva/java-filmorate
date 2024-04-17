@@ -1,24 +1,73 @@
 package ru.yandex.practicum.filmorate.service.film;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
+import ru.yandex.practicum.filmorate.validation.ValidationException;
 
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
-public interface FilmService {
-    Film findById(long filmId);
+@Service
+@Slf4j
+@RequiredArgsConstructor
+public class FilmService {
+    private final FilmStorage filmStorage;
+    private final UserStorage userStorage;
 
-    Film create(Film film);
 
-    Film getFilmById(long userId);
+    public Film create(Film film) {
+        filmStorage.create(film);
+        return film;
+    }
 
-    Film updateFilm(Film film);
+    public Film updateFilm(Film film) {
+        filmStorage.updateFilm(film);
+        return film;
+    }
 
-    HashMap<Integer, Film> getFilms();
+    public void removeLike(int filmId, int userId) {
+        filmStorage.removeLike(filmId, userId);
+    }
 
-    List<Film> findAll();
+    public HashMap<Integer, Film> getFilms() {
+        return filmStorage.getFilms();
+    }
 
-    List<Film> getTopRatedFilms(int count);
 
-    void removeLike(int filmId, int userId);
+    public List<Film> findAll() {
+        return filmStorage.findAll();
+    }
+
+    public Film findById(long filmId) {
+        return filmStorage.getFilmById(filmId);
+    }
+
+
+    public List<Film> getTopRatedFilms(int count) {
+        return filmStorage.getTopRatedFilms(count);
+    }
+
+    public Film addLike(Integer filmId, Integer userId) {
+        if (!userStorage.isUserExist(userId)) {
+            throw new ValidationException("Нет пользователя с таким id.");
+        }
+        Film film = filmStorage.getFilmById(filmId);
+        film.getLike().add(userId);
+        log.info("Добавлен лайк фильму: {} от пользователя c id: {}.", film.getName(), userId);
+        return film;
+    }
+
+    public Film deleteLike(Integer filmId, Integer userId) {
+        if (!userStorage.isUserExist(userId)) {
+            throw new ValidationException("Нет пользователя с таким id.");
+        }
+        Film film = filmStorage.getFilmById(filmId);
+        film.getLike().remove(userId);
+        log.info("Удален лайк фильму: {} от пользователя c id: {}.", film.getName(), userId);
+        return film;
+    }
 }

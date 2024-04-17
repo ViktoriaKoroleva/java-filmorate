@@ -20,14 +20,14 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping("/{userId1}/friends/{userId2}")
-    public User addFriendship(@PathVariable int userId1, @PathVariable int userId2) {
-        return userService.addFriendship(userId1, userId2);
+    @PostMapping("/{userId1}/friends/{frienId}")
+    public User addFriendship(@PathVariable int userId1, @PathVariable int frienId) {
+        return userService.addFriendship(userId1, frienId);
     }
 
     @GetMapping("/{userId}")
     public User getUserById(@PathVariable int userId) {
-        return userService.getUserById(userId);
+        return userService.getById(userId);
     }
 
     @GetMapping("/{userId}/friends")
@@ -45,18 +45,24 @@ public class UserController {
         return userService.update(user);
     }
 
+    @DeleteMapping("/{userId}")
+    public void deleteUser(@PathVariable Integer userId) {
+        log.info("Обработан DELETE user {} запрос.", userId);
+        userService.deleteById(userId);
+    }
     @PutMapping("/{id}/friends/{friendId}")
     public User addFriendsList(@PathVariable int id, @PathVariable int friendId) {
         return userService.addFriendship(id, friendId);
     }
 
-    @DeleteMapping("/{userId1}/friends/{userId2}")
-    public User removeFriendship(@PathVariable int userId1, @PathVariable int userId2) {
-        return userService.removeFriend(userId1, userId2);
+    @DeleteMapping("/{userId1}/friends/{friendId}")
+    public User removeFriendship(@PathVariable int userId1, @PathVariable int friendId) {
+        return userService.removeFriend(userId1, friendId);
     }
 
-    @GetMapping("/{userId1}/friends/common/{friendId}")
-    public List<User> findMutualFriends(@PathVariable int userId1, @PathVariable int friendId) {
-        return userService.findMutualFriends(userId1, friendId);
+    @GetMapping("/{userId}/friends")
+    public List<User> getUserFriends(@PathVariable Integer userId) {
+        log.info("Обработан GET user {} friends запрос.", userId);
+        return userService.getAllFriends(userId);
     }
 }
