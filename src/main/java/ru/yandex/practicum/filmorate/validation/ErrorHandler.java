@@ -20,10 +20,4 @@ public class ErrorHandler {
         return new ErrorResponse(String.format(e.getMessage()));
     }
 
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handle(final ValidationException e) {
-        return new ErrorResponse(String.format(e.getMessage()));
-    }
-
 }
