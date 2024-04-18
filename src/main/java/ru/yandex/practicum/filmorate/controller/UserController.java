@@ -29,8 +29,9 @@ public class UserController {
     public User update(@Valid @RequestBody User user) {
         return userService.update(user);
     }
+
     @GetMapping
-    public List<User> getAll(){
+    public List<User> getAll() {
         return userService.getAll();
     }
 
