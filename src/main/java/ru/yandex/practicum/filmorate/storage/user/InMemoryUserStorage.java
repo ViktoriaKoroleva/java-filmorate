@@ -21,9 +21,11 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User updateUser(User user) {
-        if (users.contains(user)) {
-            users.add(user);
+        if (!users.contains(user)) {
+            throw new NotFoundException("Такого пользователя не существует.");
         }
+        users.add(user);
+        log.info("Пользователь {} обновлен.", user);
         return user;
     }
 

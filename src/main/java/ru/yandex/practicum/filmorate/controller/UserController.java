@@ -29,6 +29,10 @@ public class UserController {
     public User update(@Valid @RequestBody User user) {
         return userService.update(user);
     }
+    @GetMapping
+    public List<User> getAll(){
+        return userService.getAll();
+    }
 
     @GetMapping("/{userId}")
     public User getUserById(@PathVariable int userId) {
