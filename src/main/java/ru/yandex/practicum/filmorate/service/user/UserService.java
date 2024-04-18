@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
+import ru.yandex.practicum.filmorate.validation.NotFoundException;
 
 
 import java.util.HashSet;
@@ -61,7 +62,7 @@ public class UserService {
 
     public List<User> getUserFriends(Integer userId) {
         if (!userStorage.isUserExist(userId)) {
-            throw new IllegalArgumentException("Некорректный id пользователя.");
+            throw new NotFoundException("Некорректный id пользователя.");
         }
         return getById(userId).getFriends().stream()
                 .map(this::getById)
