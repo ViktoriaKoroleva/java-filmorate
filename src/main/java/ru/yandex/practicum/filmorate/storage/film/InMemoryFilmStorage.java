@@ -64,7 +64,7 @@ public class InMemoryFilmStorage implements FilmStorage {
             films.remove(filmToRemove);
             log.info("Фильм {} удален.", filmToRemove.getName());
         } else {
-            log.warn("Фильм с ID {} не найден.", id);
+            throw new NotFoundException("Такого фильма не существует.");
         }
     }
 }
