@@ -43,7 +43,7 @@ public class FilmService {
 
     public Film addLike(Integer filmId, Integer userId) {
         if (!userStorage.isUserExist(userId)) {
-            throw new HandleNotFoundException("Нет пользователя с таким id.");
+            throw new HandleNotFoundException("Нет пользователя с таким id");
         }
         Film film = filmStorage.getById(filmId);
         film.getLike().add(userId);
