@@ -40,7 +40,7 @@ public class InMemoryUserStorage implements UserStorage {
             throw new ValidationException("Пользователь с таким email уже существует.");
         }
         user.setId(generateId());
-        if (Objects.nonNull(user.getName())|| user.getName().isEmpty()) {
+        if (Objects.nonNull(user.getName()) || user.getName().isEmpty()) {
             user.setName(user.getLogin());
         }
         users.add(user);
