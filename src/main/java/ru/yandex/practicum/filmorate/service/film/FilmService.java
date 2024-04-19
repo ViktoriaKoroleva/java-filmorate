@@ -20,7 +20,6 @@ public class FilmService {
     private final UserStorage userStorage;
     private final FilmStorage filmStorage;
 
-
     public Film create(Film film) {
         return filmStorage.create(film);
     }
