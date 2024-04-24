@@ -35,4 +35,5 @@ public class Film {
     public boolean isReleaseDateValid() {
         return releaseDate != null && !releaseDate.isBefore(LocalDate.of(1895, 12, 28));
     }
+
 }
