@@ -32,7 +32,7 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User createUser(User user) {
         if (users.contains(user)) {
-            throw new ValidationException("Такой пользователь уже существует.");
+            throw new ValidationException("Такой пользователь уже существует");
         }
         if (users.stream()
                 .filter(existingUser -> !existingUser.equals(user))
