@@ -4,57 +4,64 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.validation.ValidationException;
+import ru.yandex.practicum.filmorate.service.user.UserService;
 
 import javax.validation.Valid;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @RestController
 @RequestMapping("/users")
 @Validated
 public class UserController {
-    private final Map<Integer, User> userHashMap = new HashMap<>();
-    private int userId = 1;
+    private UserService userService;
 
-    private int generatorId() {
-        return userId++;
-    }
-
-    @GetMapping
-    public List<User> findAll() {
-        log.info("Количество пользователей: {}", userHashMap.size());
-        return List.copyOf(userHashMap.values());
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
     @PostMapping
-    public User createUser(@Valid @RequestBody User user) {
-
-        if (user.getId() == null || !userHashMap.containsKey(user.getId())) {
-            if (user.getName() == null || user.getName().isBlank()) {
-                user.setName(user.getLogin());
-            }
-            user.setId(generatorId());
-            userHashMap.put(user.getId(), user);
-            log.info("Пользователь успешно добавлен: {}", user);
-            return user;
-        } else {
-            log.info("Пользователь с таким ID уже существует");
-            throw new ValidationException("Пользователь с таким ID уже существует");
-        }
+    public User createUser(@RequestBody @Valid User user) {
+        return userService.createUser(user);
     }
 
     @PutMapping
-    public User updateUser(@Valid @RequestBody User user) {
-        if (!userHashMap.containsKey(user.getId())) {
-            log.warn("Невозможно обновить фильм");
-            throw new ValidationException("Невозможно обновить фильм");
-        }
-        userHashMap.put(user.getId(), user);
-        log.info("Фильм c id {} обновлён", user.getId());
-        return user;
+    public User update(@Valid @RequestBody User user) {
+        return userService.update(user);
     }
 
+    @GetMapping
+    public List<User> getAll() {
+        return userService.getAll();
+    }
+
+    @GetMapping("/{userId}")
+    public User getUserById(@PathVariable int userId) {
+        return userService.getById(userId);
+    }
+
+    @DeleteMapping("/{userId}")
+    public void deleteUser(@PathVariable Integer userId) {
+        userService.deleteById(userId);
+    }
+
+    @PutMapping("/{id}/friends/{friendId}")
+    public User addFriendsList(@PathVariable Integer id, @PathVariable Integer friendId) {
+        return userService.addFriendship(id, friendId);
+    }
+
+    @DeleteMapping("/{userId1}/friends/{friendId}")
+    public User removeFriendship(@PathVariable Integer userId1, @PathVariable Integer friendId) {
+        return userService.removeFriend(userId1, friendId);
+    }
+
+    @GetMapping("/{userId}/friends")
+    public List<User> getUserFriends(@PathVariable Integer userId) {
+        return userService.getUserFriends(userId);
+    }
+
+    @GetMapping("/{userId}/friends/common/{friendId}")
+    public List<User> findCommonFriends(@PathVariable Integer userId, @PathVariable Integer friendId) {
+        return userService.findCommonFriends(userId, friendId);
+    }
 }
