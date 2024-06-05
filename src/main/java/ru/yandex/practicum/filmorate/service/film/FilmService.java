@@ -92,8 +92,7 @@ public class FilmService {
     private boolean checkGenresId(List<Genre> genres) {
         List<Long> idGenres = genreStorage.getIds();
         for (Genre genre : genres) {
-            if (idGenres.contains(genre.getId())) {
-            } else {
+            if (!idGenres.contains(genre.getId())) {
                 throw new ValidationException("Genre_id = " + genre.getId() + " не найден");
             }
         }
