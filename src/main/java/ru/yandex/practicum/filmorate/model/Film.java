@@ -26,9 +26,4 @@ public class Film extends BaseUnit {
     private Mpa mpa;
     private List<Genre> genres;
 
-    @AssertTrue(message = "Дата релиза фильма должна быть не раньше 28 декабря 1895 года.")
-    @JsonIgnore
-    public boolean isReleaseDateValid() {
-        return releaseDate != null && !releaseDate.isBefore(LocalDate.of(1895, 12, 28));
-    }
 }

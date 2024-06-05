@@ -8,7 +8,9 @@ import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -56,8 +58,27 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> getAll() {
-        return null;
+    public Map<Long, Film> getAll() {
+        String sqlQuery = "select f.id, f.name, description, release_date, duration, mpa_id, m.name as mpa_name " +
+                "from films f " +
+                "left join mpa m " +
+                "on f.mpa_id=m.id ";
+        return jdbcTemplate.query(sqlQuery, FilmDbStorage::createFilmMap);
+    }
+
+    static Map createFilmMap(ResultSet rs) throws SQLException {
+        HashMap<Long, Film> mapFilm = new HashMap<>();
+        while (rs.next()) {
+            mapFilm.put(rs.getLong("id"), Film.builder()
+                    .id(rs.getLong("id"))
+                    .name(rs.getString("name"))
+                    .description(rs.getString("description"))
+                    .releaseDate(rs.getDate("release_date").toLocalDate())
+                    .duration(rs.getInt("duration"))
+                    .mpa(Mpa.builder().id(rs.getLong("mpa_id")).name(rs.getString("mpa_name")).build())
+                    .build());
+        }
+        return mapFilm;
     }
 
     @Override
@@ -69,6 +90,13 @@ public class FilmDbStorage implements FilmStorage {
                 "where f.id= ?";
         Film film = jdbcTemplate.queryForObject(sqlQuery, FilmDbStorage::createFilm, id);
         return film;
+    }
+
+    @Override
+    public List<Long> getIdFilms() {
+        String sqlQuery = "select id from films ";
+        List<Long> idFilms = jdbcTemplate.queryForList(sqlQuery, Long.class);
+        return idFilms;
     }
 
     @Override

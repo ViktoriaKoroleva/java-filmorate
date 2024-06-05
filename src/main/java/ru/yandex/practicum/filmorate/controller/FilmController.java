@@ -5,8 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
+import ru.yandex.practicum.filmorate.validation.ValidationException;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
 import java.util.List;
 
 @Slf4j
@@ -16,9 +18,11 @@ import java.util.List;
 public class FilmController {
 
     private final FilmService filmService;
+    private final static LocalDate START_RELEASE_DATE = LocalDate.of(1895, 12, 28);
 
     @PutMapping
     public Film update(@Valid @RequestBody Film film) {
+        film = validate(film);
         return filmService.update(film);
     }
 
@@ -55,5 +59,13 @@ public class FilmController {
     @GetMapping("/popular")
     public List<Film> getPopularFilms(@RequestParam(required = false) Long count) {
         return filmService.getPopularFilms(count);
+    }
+
+    public Film validate(Film data) {
+        if (data.getReleaseDate().isBefore(START_RELEASE_DATE)) {
+            log.warn("Release date film is before 28.12.1895");
+            throw new ValidationException("Film release date is invalid");
+        }
+        return data;
     }
 }

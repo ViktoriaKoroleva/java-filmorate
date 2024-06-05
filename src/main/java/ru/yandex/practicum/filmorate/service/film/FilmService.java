@@ -57,11 +57,30 @@ public class FilmService {
     }
 
     public Film update(Film film) {
-        return filmStorage.update(film);
+        if (filmStorage.getIdFilms().contains(film.getId())) {
+            film = filmStorage.update(film);
+        } else {
+            throw new ValidationException("Нет фильма с id=" + film.getId());
+        }
+        return film;
     }
 
     public List<Film> getAll() {
-        return filmStorage.getAll();
+        Map<Long, Film> films = filmStorage.getAll();
+        Map<Long, List<Long>> filmsGenres = filmGenreStorage.getAll();
+        Map<Long, Genre> genres = genreStorage.getAll();
+        List<Film> listFilms = new ArrayList<>();
+        for (Long idFilm : films.keySet()) {
+            Film film = films.get(idFilm);
+            List<Long> idGenres = filmsGenres.get(idFilm);
+            List<Genre> genresForThisFilm = new ArrayList<>();
+            for (Long idGenre : idGenres) {
+                genresForThisFilm.add(genres.get(idGenre));
+            }
+            film.setGenres(genresForThisFilm);
+            listFilms.add(film);
+        }
+        return listFilms;
     }
 
     public Film getById(Long id) {
