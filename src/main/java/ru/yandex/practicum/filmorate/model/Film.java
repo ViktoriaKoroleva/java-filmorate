@@ -2,38 +2,34 @@ package ru.yandex.practicum.filmorate.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
+import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
-@Getter
-@Setter
-@ToString
-@EqualsAndHashCode(of = {"id"})
-@Builder
-public class Film {
-    private Integer id;
-
-    private final Set<Integer> like = new HashSet<>();
-    @NotBlank(message = "Название фильма не может быть пустым.")
+@Data
+@Validated
+@SuperBuilder
+@EqualsAndHashCode(callSuper = true)
+@AllArgsConstructor
+public class Film extends BaseUnit {
+    @NotBlank
     private String name;
-
-    @NotBlank(message = "Описание фильма не может быть пустым")
-    @Size(max = 200, message = "Длина описания фильма не должна превышать 200 символов.")
+    @Size(max = 200)
     private String description;
-
-    @NotNull(message = "Дата релиза не может быть пустой.")
+    @NotNull
     private LocalDate releaseDate;
-
-    @Positive(message = "Продолжительность фильма должна быть положительной.")
+    @Min(1)
     private int duration;
+    private Mpa mpa;
+    private List<Genre> genres;
 
     @AssertTrue(message = "Дата релиза фильма должна быть не раньше 28 декабря 1895 года.")
     @JsonIgnore
     public boolean isReleaseDateValid() {
         return releaseDate != null && !releaseDate.isBefore(LocalDate.of(1895, 12, 28));
     }
-
 }

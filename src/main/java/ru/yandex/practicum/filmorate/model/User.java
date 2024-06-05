@@ -11,7 +11,6 @@ import java.util.Set;
 @Setter
 @ToString
 @EqualsAndHashCode(of = {"id"})
-@Builder
 public class User {
 
     private Integer id;
