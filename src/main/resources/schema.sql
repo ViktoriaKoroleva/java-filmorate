@@ -50,3 +50,17 @@ create table if not exists likes
     film_id int references films(id),
     primary key (user_id, film_id)
 );
+merge into GENRES (id, name)
+    values (1, 'Комедия'),
+           (2, 'Драма'),
+           (3, 'Мультфильм'),
+           (4, 'Триллер'),
+           (5, 'Документальный'),
+           (6, 'Боевик');
+
+merge into MPA (id, name)
+    values (1, 'G'),
+           (2, 'PG'),
+           (3, 'PG-13'),
+           (4, 'R'),
+           (5, 'NC-17');
