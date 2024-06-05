@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.springframework.validation.annotation.Validated;
@@ -25,5 +24,4 @@ public class Film extends BaseUnit {
     private int duration;
     private Mpa mpa;
     private List<Genre> genres;
-
 }
