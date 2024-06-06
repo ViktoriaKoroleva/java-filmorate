@@ -1,20 +1,20 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.*;
+import lombok.experimental.SuperBuilder;
+import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
-@Getter
-@Setter
-@ToString
-@EqualsAndHashCode(of = {"id"})
-public class User {
-
-    private Integer id;
-
+@Data
+@SuperBuilder
+@Validated
+@EqualsAndHashCode(callSuper = true)
+@AllArgsConstructor
+public class User extends BaseUnit {
     private final Set<Integer> friends = new HashSet<>();
 
     @NotBlank(message = "Электронная почта не может быть пустой.")

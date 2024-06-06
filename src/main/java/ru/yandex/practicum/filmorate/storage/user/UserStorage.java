@@ -12,9 +12,10 @@ public interface UserStorage {
 
     List<User> getAll();
 
-    boolean isUserExist(Integer id);
-
     void deleteById(Integer userId);
 
-    User getById(int userId);
+    List<Long> getIdUsers();
+
+    User getById(Long userId);
+
 }

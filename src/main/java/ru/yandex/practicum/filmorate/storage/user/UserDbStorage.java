@@ -19,11 +19,13 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User updateUser(User user) {
-        validateUserId(user.getId());
-
         validateUser(user);
 
-        String sql = "update USERS set EMAIL = ?, LOGIN = ?, NAME = ?, BIRTHDAY = ? where ID = ?";
+        String sql = "update users set login=?, " +
+                "name = ?, " +
+                "email=?, " +
+                "birthday=? " +
+                "where id= ?";
 
         jdbcTemplate.update(sql,
                 user.getEmail(),
@@ -32,25 +34,15 @@ public class UserDbStorage implements UserStorage {
                 user.getBirthday(),
                 user.getId());
 
-        String sqlCheckQuery = "select * from USERS where LOGIN = ?";
-        return jdbcTemplate.queryForObject(sqlCheckQuery, this::resultSetToUser, user.getLogin());
+        return getById(user.getId());
 
-    }
-
-    private void validateUserId(int userId) {
-        String sqlIdCheck = "select ID from USERS";
-        List<Integer> ids = jdbcTemplate.query(sqlIdCheck, (rs, rowNum) -> (Integer.parseInt(rs.getString("ID"))));
-
-        if (!ids.contains(userId)) {
-            throw new NotFoundException("Пользователь с ID не найден в БД.");
-        }
     }
 
     @Override
     public User createUser(User user) {
         validateUser(user);
 
-        String sql = "insert into users(email, login, name, birthday) values(?, ?, ?, ?)";
+        String sql = "insert into users (login, name, email, birthday) values(?, ?, ?, ?)";
 
         jdbcTemplate.update(sql,
                 user.getEmail(),
@@ -59,33 +51,27 @@ public class UserDbStorage implements UserStorage {
                 user.getBirthday().toString()
         );
 
-        String sqlCheckQuery = "select * from USERS where LOGIN = ?";
-        return jdbcTemplate.queryForObject(sqlCheckQuery, this::resultSetToUser, user.getLogin());
+        String sqlCheckQuery = "select * from users where login= ? and name=? and email=? and birthday=?";
+        User userFromBd = jdbcTemplate.queryForObject(sqlCheckQuery, UserDbStorage::createUser, user.getLogin(), user.getName(),
+                user.getEmail(), user.getBirthday());
+        return userFromBd;
 
+    }
+
+    static User createUser(ResultSet rs, int rowNum) throws SQLException {
+        return User.builder()
+                .id(rs.getLong("id"))
+                .name(rs.getString("name"))
+                .login(rs.getString("login"))
+                .email(rs.getString("email"))
+                .birthday(rs.getDate("birthday").toLocalDate())
+                .build();
     }
 
     @Override
     public List<User> getAll() {
-        String sql = "select * from USERS order by ID";
-
-        return this.jdbcTemplate.query(
-                sql,
-                (resultSet, rowNum) -> {
-                    User user = new User();
-                    user.setId(Integer.parseInt(resultSet.getString("ID")));
-                    user.setEmail(resultSet.getString("EMAIL"));
-                    user.setLogin(resultSet.getString("LOGIN"));
-                    user.setName(resultSet.getString("NAME"));
-                    user.setBirthday(LocalDate.parse(resultSet.getString("BIRTHDAY")));
-                    return user;
-                });
-    }
-
-    @Override
-    public boolean isUserExist(Integer id) {
-        String sql = "SELECT COUNT(*) FROM USERS WHERE ID = ?";
-        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, id);
-        return count != null && count > 0;
+        String sqlQuery = "select * from users";
+        return jdbcTemplate.query(sqlQuery, UserDbStorage::createUser);
     }
 
     @Override
@@ -98,22 +84,17 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public User getById(int userId) {
-        String sql = "select * from USERS where id = ?";
-        return jdbcTemplate.queryForObject(sql, this::resultSetToUser, userId);
-
+    public List<Long> getIdUsers() {
+        String sqlQuery = "select id from users ";
+        List<Long> idUsers = jdbcTemplate.queryForList(sqlQuery, Long.class);
+        return idUsers;
     }
 
-    private User resultSetToUser(ResultSet rs, int rowNum) throws SQLException {
-        User resultUser = new User();
-
-        resultUser.setId(rs.getInt("ID"));
-        resultUser.setEmail(rs.getString("EMAIL"));
-        resultUser.setLogin(rs.getString("LOGIN"));
-        resultUser.setName(rs.getString("NAME"));
-        resultUser.setBirthday(rs.getDate("BIRTHDAY").toLocalDate());
-
-        return resultUser;
+    @Override
+    public User getById(Long userId) {
+        String sqlQuery = "select * from users where id= ?";
+        User user = jdbcTemplate.queryForObject(sqlQuery, UserDbStorage::createUser, userId);
+        return user;
     }
 
     private void validateUser(User user) throws ValidationException {
