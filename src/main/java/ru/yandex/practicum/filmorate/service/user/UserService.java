@@ -36,15 +36,11 @@ public class UserService {
     }
 
     public List<User> getAll() {
-        return userStorage.getAll();
+        return new ArrayList<>(userStorage.getAll());
     }
 
     public User getById(Long id) {
         return userStorage.getById(id);
-    }
-
-    public void deleteById(Integer id) {
-        userStorage.deleteById(id);
     }
 
     public void addFriendship(Long idUser, Long idFriend) {

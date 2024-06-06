@@ -14,7 +14,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/films")
 public class FilmController {
-
     private final FilmService filmService;
 
     @PutMapping
@@ -25,11 +24,6 @@ public class FilmController {
     @GetMapping("/{filmId}")
     public Film getById(@PathVariable Long filmId) {
         return filmService.getById(filmId);
-    }
-
-    @DeleteMapping("/{filmId}")
-    public void delete(@PathVariable Integer filmId) {
-        filmService.deleteById(filmId);
     }
 
     @GetMapping

@@ -60,35 +60,38 @@ public class FilmService {
         if (filmStorage.getIdFilms().contains(film.getId())) {
             film = filmStorage.update(film);
         } else {
-            throw new ValidationException("Нет фильма с id=" + film.getId());
+            throw new ValidationException("Нет фильма с id = " + film.getId());
         }
         return film;
     }
 
     public List<Film> getAll() {
-        Map<Long, Film> films = filmStorage.getAll();
-        Map<Long, List<Long>> filmsGenres = filmGenreStorage.getAll();
-        Map<Long, Genre> genres = genreStorage.getAll();
-        List<Film> listFilms = new ArrayList<>();
-        for (Long idFilm : films.keySet()) {
-            Film film = films.get(idFilm);
-            List<Long> idGenres = filmsGenres.get(idFilm);
-            List<Genre> genresForThisFilm = new ArrayList<>();
-            for (Long idGenre : idGenres) {
-                genresForThisFilm.add(genres.get(idGenre));
+        try {
+            Map<Long, Film> films = filmStorage.getAll();
+            Map<Long, List<Long>> filmsGenres = filmGenreStorage.getAll();
+            Map<Long, Genre> genres = genreStorage.getAll();
+
+            List<Film> listFilms = new ArrayList<>();
+            for (Long idFilm: films.keySet()) {
+                Film film = films.get(idFilm);
+                List<Long> idGenres = filmsGenres.get(idFilm);
+                List<Genre> genresForThisFilm = new ArrayList<>();
+                for (Long idGenre: idGenres) {
+                    genresForThisFilm.add(genres.get(idGenre));
+                }
+                film.setGenres(genresForThisFilm);
+                listFilms.add(film);
             }
-            film.setGenres(genresForThisFilm);
-            listFilms.add(film);
+            return listFilms;
+        } catch (Exception e) {
+            System.err.println("Ошибка при получении всех фильмов: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Внутренняя ошибка сервера при получении всех фильмов", e);
         }
-        return listFilms;
     }
 
     public Film getById(Long id) {
         return filmStorage.getById(id);
-    }
-
-    public void deleteById(Integer id) {
-        filmStorage.deleteById(id);
     }
 
     public void addLike(Long filmId, Long userId) {

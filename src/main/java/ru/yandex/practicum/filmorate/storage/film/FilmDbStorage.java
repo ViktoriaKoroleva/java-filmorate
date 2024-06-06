@@ -98,10 +98,4 @@ public class FilmDbStorage implements FilmStorage {
         List<Long> idFilms = jdbcTemplate.queryForList(sqlQuery, Long.class);
         return idFilms;
     }
-
-    @Override
-    public void deleteById(Integer id) {
-        String sqlQuery = "delete from films where id = ?";
-        jdbcTemplate.update(sqlQuery, id);
-    }
 }
