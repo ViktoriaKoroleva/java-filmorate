@@ -6,8 +6,6 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
 
 @Data
 @SuperBuilder
@@ -15,20 +13,13 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 public class User extends BaseUnit {
-    private final Set<Integer> friends = new HashSet<>();
-
-    @NotBlank(message = "Электронная почта не может быть пустой.")
-    @Email(message = "Неверный формат электронной почты.")
+    @NotEmpty
+    @Email
     private String email;
-
-    @NotBlank(message = "Логин не может быть пустым.")
-    @Pattern(regexp = "\\S+", message = "Логин не может содержать пробелы")
+    @NotBlank
     private String login;
-
     private String name;
-
-    @NotNull(message = "Дата рождения не может быть пустой")
-    @Past(message = "Дата рождения не может быть в будущем.")
+    @PastOrPresent
     private LocalDate birthday;
 }
 
