@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
-import ru.yandex.practicum.filmorate.validation.ValidationException;
+import ru.yandex.practicum.filmorate.validation.NotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,11 +20,11 @@ public class MpaService {
     }
 
     public Mpa get(Long id) {
-        Map<Long, Mpa> mpas = mpaStorage.getAll();
-        if (mpas.containsKey(id)) {
-            return mpas.get(id);
+        Map<Long, Mpa> mpaMap = mpaStorage.getAll();
+        if (mpaMap.containsKey(id)) {
+            return mpaMap.get(id);
         } else {
-            throw new ValidationException("В бд нет MPA с id=" + id);
+            throw new NotFoundException("В бд нет MPA с id=" + id);
         }
     }
 }

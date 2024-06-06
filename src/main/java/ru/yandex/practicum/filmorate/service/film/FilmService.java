@@ -13,6 +13,7 @@ import ru.yandex.practicum.filmorate.storage.film.LikeStorage;
 import ru.yandex.practicum.filmorate.storage.genre.FilmGenreStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
+import ru.yandex.practicum.filmorate.validation.NotFoundException;
 import ru.yandex.practicum.filmorate.validation.ValidationException;
 
 import java.util.ArrayList;
@@ -60,7 +61,7 @@ public class FilmService {
         if (filmStorage.getIdFilms().contains(film.getId())) {
             film = filmStorage.update(film);
         } else {
-            throw new ValidationException("Нет фильма с id = " + film.getId());
+            throw new NotFoundException("Нет фильма с id = " + film.getId());
         }
         return film;
     }
@@ -86,7 +87,7 @@ public class FilmService {
         } catch (Exception e) {
             System.err.println("Ошибка при получении всех фильмов: " + e.getMessage());
             e.printStackTrace();
-            throw new RuntimeException("Внутренняя ошибка сервера при получении всех фильмов", e);
+            throw new NotFoundException("Внутренняя ошибка сервера при получении всех фильмов");
         }
     }
 
