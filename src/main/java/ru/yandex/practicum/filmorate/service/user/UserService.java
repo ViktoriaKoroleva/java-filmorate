@@ -70,7 +70,7 @@ public class UserService {
         friendStorage.removeFriend(userId, friendId);
     }
 
-    public List<User> getUserFriends(Integer userId) {
+    public List<User> getUserFriends(Long userId) {
         List<Long> idsUsersFromBd = userStorage.getIdUsers();
         if (!(idsUsersFromBd.contains(userId))) {
             throw new ValidationException("В бд нет пользователя с таким id=" + userId);

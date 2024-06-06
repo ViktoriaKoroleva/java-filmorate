@@ -15,16 +15,6 @@ import java.util.Map;
 public class FriendDbStorage implements FriendStorage {
     private final JdbcTemplate jdbcTemplate;
 
-    private static User mapUser(ResultSet rs, int rowNum) throws SQLException {
-        return User.builder()
-                .id(rs.getLong("id"))
-                .name(rs.getString("name"))
-                .login(rs.getString("login"))
-                .email(rs.getString("email"))
-                .birthday(rs.getDate("birthday").toLocalDate())
-                .build();
-    }
-
     private static Map<Long, User> mapUserMap(ResultSet rs) throws SQLException {
         Map<Long, User> usersMap = new HashMap<>();
         while (rs.next()) {

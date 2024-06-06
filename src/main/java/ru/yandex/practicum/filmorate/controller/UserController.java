@@ -51,12 +51,12 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId1}/friends/{friendId}")
-    public void removeFriendship(@PathVariable Long userId1, @PathVariable Long friendId) {
+    public void removeFriend(@PathVariable Long userId1, @PathVariable Long friendId) {
         userService.removeFriend(userId1, friendId);
     }
 
     @GetMapping("/{userId}/friends")
-    public List<User> getUserFriends(@PathVariable Integer userId) {
+    public List<User> getUserFriends(@PathVariable Long userId) {
         return userService.getUserFriends(userId);
     }
 
