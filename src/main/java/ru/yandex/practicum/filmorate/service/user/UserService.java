@@ -62,7 +62,7 @@ public class UserService {
             throw new ValidationException("В бд нет пользователя с таким id=" + userId);
         }
         if (!(idsUsersFromBd.contains(userId))) {
-            throw new ValidationException("В бд нет пользователя с таким id=" + friendId);
+            throw new ValidationException("В бд нет пользователя с таким id=" + userId);
         }
         friendStorage.removeFriend(userId, friendId);
     }
