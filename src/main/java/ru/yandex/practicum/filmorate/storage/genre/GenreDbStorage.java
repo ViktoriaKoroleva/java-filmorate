@@ -7,9 +7,9 @@ import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -18,29 +18,40 @@ public class GenreDbStorage implements GenreStorage {
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public Map<Long, Genre> getAll() {
+    public Map getAll() {
         String sqlQuery = "select * from genres";
-        List<Genre> genreList = jdbcTemplate.query(sqlQuery, GenreDbStorage::createGenre);
-        return genreList.stream().collect(Collectors.toMap(Genre::getId, genre -> genre));
+        return jdbcTemplate.query(sqlQuery, GenreDbStorage::createGenreMap);
     }
 
     @Override
     public Genre get(Long id) {
-        String sqlQuery = "select * from genres where id = ?";
-        return jdbcTemplate.queryForObject(sqlQuery, GenreDbStorage::createGenre, id);
+        String sqlQuery = "select * from genres where id= ?";
+        Genre genres = jdbcTemplate.queryForObject(sqlQuery, GenreDbStorage::createGenre, id);
+        return genres;
     }
 
     @Override
     public List<Long> getIds() {
         String sqlQuery = "select id from genres";
-        return jdbcTemplate.queryForList(sqlQuery, Long.class);
+        List<Long> genreIds = jdbcTemplate.queryForList(sqlQuery, Long.class);
+        return genreIds;
     }
 
-
-    private static Genre createGenre(ResultSet rs, int rowNum) throws SQLException {
+    static Genre createGenre(ResultSet rs, int rowNum) throws SQLException {
         return Genre.builder()
                 .id(rs.getLong("id"))
                 .name(rs.getString("name"))
                 .build();
+    }
+
+    static Map createGenreMap(ResultSet rs) throws SQLException {
+        Map<Long, Genre> genres = new HashMap<>();
+        while (rs.next()) {
+            genres.put(rs.getLong("id"), Genre.builder()
+                    .id(rs.getLong("id"))
+                    .name(rs.getString("name"))
+                    .build());
+        }
+        return genres;
     }
 }

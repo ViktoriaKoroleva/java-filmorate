@@ -43,6 +43,7 @@ public class UserService {
         return userStorage.getById(id);
     }
 
+
     public void addFriendship(Long idUser, Long idFriend) {
         List<Long> idsUsersFromBd = userStorage.getIdUsers();
         if (!(idsUsersFromBd.contains(idUser))) {
@@ -61,7 +62,7 @@ public class UserService {
             throw new ValidationException("В бд нет пользователя с таким id=" + userId);
         }
         if (!(idsUsersFromBd.contains(userId))) {
-            throw new ValidationException("В бд нет пользователя с таким id=" + userId);
+            throw new ValidationException("В бд нет пользователя с таким id=" + friendId);
         }
         friendStorage.removeFriend(userId, friendId);
     }
