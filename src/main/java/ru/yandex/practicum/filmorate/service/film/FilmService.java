@@ -13,7 +13,6 @@ import ru.yandex.practicum.filmorate.storage.film.LikeStorage;
 import ru.yandex.practicum.filmorate.storage.genre.FilmGenreStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
-import ru.yandex.practicum.filmorate.validation.HandleNotFoundException;
 import ru.yandex.practicum.filmorate.validation.NotFoundException;
 import ru.yandex.practicum.filmorate.validation.ValidationException;
 
@@ -87,7 +86,7 @@ public class FilmService {
             return listFilms;
         } catch (Exception e) {
             e.printStackTrace();
-            throw new HandleNotFoundException("Внутренняя ошибка сервера при получении всех фильмов");
+            throw new NotFoundException("Внутренняя ошибка сервера при получении всех фильмов");
         }
     }
 
