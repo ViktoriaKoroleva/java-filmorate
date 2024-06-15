@@ -1,14 +1,18 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Primary;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.validation.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.validation.ValidationException;
 
 import java.sql.Date;
@@ -18,8 +22,10 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Component
+@Repository
+@Primary
 @RequiredArgsConstructor
+@Slf4j
 public class FilmDbStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
 
@@ -107,7 +113,7 @@ public class FilmDbStorage implements FilmStorage {
         try {
             return Optional.of(jdbcTemplate.queryForObject(sqlQuery, this::makeFilm, filmId));
         } catch (EmptyResultDataAccessException e) {
-            throw new ValidationException(String.format("Фильм № %d не найден", filmId));
+            throw new FilmNotFoundException(String.format("Фильм № %d не найден", filmId));
         }
     }
 

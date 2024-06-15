@@ -10,6 +10,8 @@ import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.Like.LikeStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
+import ru.yandex.practicum.filmorate.validation.GenreNotFoundException;
+import ru.yandex.practicum.filmorate.validation.MPANotFoundException;
 import ru.yandex.practicum.filmorate.validation.ValidationException;
 
 import java.util.HashSet;
@@ -55,7 +57,7 @@ public class FilmService {
         return filmStorage.findGenreById(genreId)
                 .orElseThrow(() -> {
                     log.warn("Жанр № {} не найден", genreId);
-                    throw new ValidationException(String.format("Жанр № %d не найден", genreId));
+                    throw new GenreNotFoundException(String.format("Жанр № %d не найден", genreId));
                 });
     }
 
@@ -67,7 +69,7 @@ public class FilmService {
         return filmStorage.ratingMPASearchById(ratIdMpa)
                 .orElseThrow(() -> {
                     log.warn("Рейтинг МПА № {} не найден", ratIdMpa);
-                    throw new ValidationException(String.format("Рейтинг МПА № %d не найден", ratIdMpa));
+                    throw new MPANotFoundException(String.format("Рейтинг МПА № %d не найден", ratIdMpa));
                 });
     }
 
