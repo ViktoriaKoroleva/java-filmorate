@@ -1,23 +1,18 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
-import org.springframework.validation.annotation.Validated;
+import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 
 @Data
-@Validated
-@SuperBuilder
-@EqualsAndHashCode(callSuper = true)
-@AllArgsConstructor
-@NoArgsConstructor
-public class Mpa extends BaseUnit {
+public class Mpa {
+    @NonNull
+    private final Long id;
 
-    @NotBlank
-    private String name;
+    @NotBlank(message = "Ошибка! Название не может быть пустым.")
+    private final String name;
+
+    @NotBlank(message = "Ошибка! Описание не может быть пустым.")
+    private final String description;
 
 }

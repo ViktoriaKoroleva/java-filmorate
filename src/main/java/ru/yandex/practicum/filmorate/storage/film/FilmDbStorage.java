@@ -1,101 +1,172 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.validation.ValidationException;
 
+import java.sql.Date;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
 public class FilmDbStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
 
-    static Film createFilm(ResultSet rs, int rowNum) throws SQLException {
-        return Film.builder()
-                .id(rs.getLong("id"))
-                .name(rs.getString("name"))
-                .description(rs.getString("description"))
-                .releaseDate(rs.getDate("release_date").toLocalDate())
-                .duration(rs.getInt("duration"))
-                .mpa(Mpa.builder().id(rs.getLong("mpa_id")).name(rs.getString("mpa_name")).build())
-                .build();
-    }
-
     @Override
-    public Film create(Film film) {
-        String sqlQuery = "insert into films (name, description, release_date, duration, mpa_id) values (?, ?, ?, ?, ?)";
-        jdbcTemplate.update(sqlQuery, film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(),
-                film.getMpa().getId());
-        String sqlQueryFilm = "select f.id, f.name, description, release_date, duration, mpa_id, m.name as mpa_name " +
-                "from films f " +
-                "left join mpa m " +
-                "on f.mpa_id=m.id " +
-                "where f.name= ? and description=? and release_date=? and duration=? ";
-        Film filmFromBd = jdbcTemplate.queryForObject(sqlQueryFilm, FilmDbStorage::createFilm, film.getName(), film.getDescription(),
-                film.getReleaseDate(), film.getDuration());
-        return filmFromBd;
+    public Optional<Film> createFilm(Film film) {
+        String sqlQuery = "insert into films(film_name, description, release_date, duration, rate, rating_mpa_id) " +
+                " values (?, ?, ?, ?, ?, ?)";
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        jdbcTemplate.update(connection -> {
+            PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[]{"film_id"});
+            stmt.setString(1, film.getName());
+            stmt.setString(2, film.getDescription());
+            stmt.setDate(3, Date.valueOf(film.getReleaseDate()));
+            stmt.setInt(4, film.getDuration());
+            stmt.setInt(5, film.getRate());
+            stmt.setLong(6, film.getMpa().getId());
+
+            return stmt;
+        }, keyHolder);
+
+        film.setId(keyHolder.getKey().longValue());
+        film.setMpa(ratingMPASearchById(film.getMpa().getId()).get());
+        Film updateFilm = updateGenres(film);
+        return Optional.of(updateFilm);
     }
 
-    @Override
-    public Film update(Film film) {
-        String sqlQuery = "update films set name = ?, " +
-                "description=?, " +
-                "release_date=?, " +
-                "duration=?, " +
-                "mpa_id=? " +
-                "where id= ?";
-        jdbcTemplate.update(sqlQuery, film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(),
-                film.getMpa().getId(),
-                film.getId());
-        return getById(film.getId());
+    private void createGenre(Long filmId, Genre genre) {
+        String sqlQuery = "insert into film_genre(film_id, genre_id) " +
+                " values (?, ?)";
+        jdbcTemplate.update(sqlQuery, filmId, genre.getId());
     }
 
-    @Override
-    public Map<Long, Film> getAll() {
-        String sqlQuery = "select f.id, f.name, description, release_date, duration, mpa_id, m.name as mpa_name " +
-                "from films f " +
-                "left join mpa m " +
-                "on f.mpa_id=m.id ";
-        return jdbcTemplate.query(sqlQuery, FilmDbStorage::createFilmMap);
-    }
-
-    static Map createFilmMap(ResultSet rs) throws SQLException {
-        HashMap<Long, Film> mapFilm = new HashMap<>();
-        while (rs.next()) {
-            mapFilm.put(rs.getLong("id"), Film.builder()
-                    .id(rs.getLong("id"))
-                    .name(rs.getString("name"))
-                    .description(rs.getString("description"))
-                    .releaseDate(rs.getDate("release_date").toLocalDate())
-                    .duration(rs.getInt("duration"))
-                    .mpa(Mpa.builder().id(rs.getLong("mpa_id")).name(rs.getString("mpa_name")).build())
-                    .build());
+    private Film updateGenres(Film film) {
+        film.setGenres(film.getGenres().stream()
+                .map(genre -> findGenreById(genre.getId()).get())
+                .sorted(Comparator.comparing(Genre::getId))
+                .collect(Collectors.toSet()));
+        for (Genre genre : film.getGenres()) {
+            createGenre(film.getId(), genre);
         }
-        return mapFilm;
-    }
-
-    @Override
-    public Film getById(Long id) {
-        String sqlQuery = "select f.id, f.name, description, release_date, duration, mpa_id, m.name as mpa_name " +
-                "from films f " +
-                "left join mpa m " +
-                "on f.mpa_id=m.id " +
-                "where f.id= ?";
-        Film film = jdbcTemplate.queryForObject(sqlQuery, FilmDbStorage::createFilm, id);
         return film;
     }
 
     @Override
-    public List<Long> getIdFilms() {
-        String sqlQuery = "select id from films ";
-        List<Long> idFilms = jdbcTemplate.queryForList(sqlQuery, Long.class);
-        return idFilms;
+    public Optional<Film> updateFilm(Film film) {
+        if (getFilmById(film.getId()) == null) {
+            return null;
+        }
+        String sqlQuery = "update films set film_name = ?, description = ?, release_date = ?, " +
+                "duration = ?, rate = ?, rating_mpa_id = ? where film_id = ?";
+        jdbcTemplate.update(sqlQuery, film.getName(), film.getDescription(), film.getReleaseDate(),
+                film.getDuration(), film.getRate(), film.getMpa().getId(), film.getId());
+
+        film.setMpa(ratingMPASearchById(film.getMpa().getId()).get());
+        deleteGenres(film.getId());
+        film = updateGenres(film);
+        return Optional.of(film);
     }
+
+    @Override
+    public boolean deleteFilm(Film film) {
+        if (getFilmById(film.getId()).isEmpty()) {
+            return false;
+        }
+        String sqlQuery = "delete from films where film_id = ?";
+        return jdbcTemplate.update(sqlQuery, film.getId()) > 0;
+
+    }
+
+    private void deleteGenres(Long filmId) {
+        String sqlQuery = "delete from film_genre where film_id = ?";
+        jdbcTemplate.update(sqlQuery, filmId);
+    }
+
+    @Override
+    public List<Film> findFilms() {
+        String sqlQuery = "select * from films";
+        return jdbcTemplate.query(sqlQuery, this::makeFilm);
+    }
+
+    @Override
+    public Optional<Film> getFilmById(long filmId) {
+        String sqlQuery = "select * from films where film_id = ?";
+        try {
+            return Optional.of(jdbcTemplate.queryForObject(sqlQuery, this::makeFilm, filmId));
+        } catch (EmptyResultDataAccessException e) {
+            throw new ValidationException(String.format("Фильм № %d не найден", filmId));
+        }
+    }
+
+    @Override
+    public List<Genre> findGenres() {
+        String sqlQuery = "select * from genres";
+        return jdbcTemplate.query(sqlQuery, this::makeGenre);
+    }
+
+    public Optional<Genre> findGenreById(long genreId) {
+        String sqlQuery = "select * from genres where genre_id = ?";
+        try {
+            return Optional.of(jdbcTemplate.queryForObject(sqlQuery, this::makeGenre, genreId));
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public List<Mpa> ratingMPASearch() {
+        String sqlQuery = "select * from rating_mpa";
+        return jdbcTemplate.query(sqlQuery, this::makeRatingMPA);
+
+    }
+
+    public Optional<Mpa> ratingMPASearchById(long ratIdMpa) {
+        String sqlQuery = "select * from rating_mpa where rating_mpa_id = ?";
+        try {
+            return Optional.of(jdbcTemplate.queryForObject(sqlQuery, this::makeRatingMPA, ratIdMpa));
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
+    }
+
+    private List<Genre> findGenresByFilmId(Long filmId) {
+        String sqlQuery = "select * from film_genre as fg " +
+                "join genres as g on g.genre_id = fg.genre_id " +
+                "where fg.film_id = ? order by genre_id";
+        return jdbcTemplate.query(sqlQuery, this::makeGenre, filmId);
+    }
+
+    private Film makeFilm(ResultSet rs, int rowNum) throws SQLException {
+        Film film = new Film(rs.getString("film_name"), rs.getString("description"),
+                rs.getDate("release_date").toLocalDate());
+        film.setId(rs.getLong("film_id"));
+        film.setDuration(rs.getInt("duration"));
+        film.setRate(rs.getInt("rate"));
+        film.setGenres(new HashSet<>(findGenresByFilmId(film.getId())));
+        film.setMpa(ratingMPASearchById(rs.getLong("rating_mpa_id")).get());
+        return film;
+    }
+
+    private Genre makeGenre(ResultSet rs, int rowNum) throws SQLException {
+        return new Genre(rs.getLong("genre_id"), rs.getString("genre_name"));
+    }
+
+    private Mpa makeRatingMPA(ResultSet rs, int rowNum) throws SQLException {
+        return new Mpa(rs.getLong("rating_mpa_id"),
+                rs.getString("rating_mpa_name"), rs.getString("description"));
+    }
+
 }

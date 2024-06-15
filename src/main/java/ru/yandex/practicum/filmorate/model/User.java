@@ -1,25 +1,23 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
-import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
 
 @Data
-@SuperBuilder
-@Validated
-@EqualsAndHashCode(callSuper = true)
-@AllArgsConstructor
-public class User extends BaseUnit {
+public class User {
+    private long id;
     @NotEmpty
     @Email
+    @NonNull
     private String email;
-    @NotBlank
+    @NonNull
     private String login;
     private String name;
-    @PastOrPresent
+    @NonNull
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthday;
 }
 

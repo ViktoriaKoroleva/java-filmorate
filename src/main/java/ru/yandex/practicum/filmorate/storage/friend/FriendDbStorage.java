@@ -3,50 +3,34 @@ package ru.yandex.practicum.filmorate.storage.friend;
 import org.springframework.stereotype.Component;
 import org.springframework.jdbc.core.JdbcTemplate;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
-@Component
+@Repository
 @RequiredArgsConstructor
 public class FriendDbStorage implements FriendStorage {
     private final JdbcTemplate jdbcTemplate;
 
-    private static Map<Long, User> mapUserMap(ResultSet rs) throws SQLException {
-        Map<Long, User> usersMap = new HashMap<>();
-        while (rs.next()) {
-            usersMap.put(rs.getLong("id"), User.builder()
-                    .id(rs.getLong("id"))
-                    .name(rs.getString("name"))
-                    .login(rs.getString("login"))
-                    .email(rs.getString("email"))
-                    .birthday(rs.getDate("birthday").toLocalDate())
-                    .build());
-        }
-        return usersMap;
-    }
 
     @Override
-    public void addFriend(long userId, long friendId) {
-        String query = "INSERT INTO friends (user_id, friend_id) VALUES (?, ?)";
-        jdbcTemplate.update(query, userId, friendId);
+    public boolean addFriend(User friendRequest, User friendResponse) {
+        String sqlQuery = "merge into friends(request_friend_id,response_friend_id) values (?, ?)";
+        return jdbcTemplate.update(sqlQuery, friendRequest.getId(), friendResponse.getId()) > 0;
+
     }
 
-    @Override
-    public void removeFriend(long userId, long friendId) {
+    public boolean removeFriend(User friendRequest, User friendResponse) {
         String query = "DELETE FROM friends WHERE user_id = ? AND friend_id = ?";
-        jdbcTemplate.update(query, userId, friendId);
+        return jdbcTemplate.update(query, friendRequest.getId(), friendResponse.getId()) > 0;
+
     }
 
-    @Override
-    public Map<Long, User> getFriends(long userId) {
-        String query = "SELECT u.id, u.login, u.name, u.email, u.birthday " +
-                "FROM friends f " +
-                "LEFT JOIN users u ON u.id = f.friend_id " +
-                "WHERE f.user_id = ?";
-        return jdbcTemplate.query(query, FriendDbStorage::mapUserMap, userId);
+    public List<Long> findFriends(long id) {
+        String sqlQuery = "select response_friend_id from friends " +
+                "where request_friend_id = ?";
+        return jdbcTemplate.query(sqlQuery, (rs, rowNum) -> rs.getLong("response_friend_id"), id);
+
     }
 }

@@ -1,70 +1,90 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Primary;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.validation.UserNotFoundException;
 
+import java.sql.Date;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
-@Component
+@Repository
+@Primary
 @RequiredArgsConstructor
+@Slf4j
 public class UserDbStorage implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
 
+
     @Override
-    public User updateUser(User user) {
-
-        String sqlQuery = "update users set login=?, " +
-                "name = ?, " +
-                "email=?, " +
-                "birthday=? " +
-                "where id= ?";
-        jdbcTemplate.update(sqlQuery, user.getLogin(), user.getName(), user.getEmail(), user.getBirthday(), user.getId());
-        return getById(user.getId());
-
+    public Optional<User> updateUser(User user) {
+        String sqlQuery = "update users set user_name = ?, email = ?, login = ?, birthday = ?" +
+                " where user_id = ?";
+        jdbcTemplate.update(sqlQuery, user.getName(), user.getEmail(), user.getLogin(),
+                user.getBirthday(), user.getId());
+        return Optional.of(user);
     }
 
     @Override
-    public User createUser(User user) {
-        String sqlQuery = "insert into users (login, name, email, birthday) values (?, ?, ?, ?)";
-        jdbcTemplate.update(sqlQuery, user.getLogin(), user.getName(), user.getEmail(), user.getBirthday());
-        String sqlQueryUser = "select * from users where login= ? and name=? and email=? and birthday=?";
-        User userFromBd = jdbcTemplate.queryForObject(sqlQueryUser, UserDbStorage::createUser, user.getLogin(), user.getName(),
-                user.getEmail(), user.getBirthday());
-        return userFromBd;
+    public Optional<User> createUser(User user) {
+        String sqlQuery = "insert into users(user_name, email, login, birthday) values (?, ?, ?, ?)";
+        KeyHolder keyHolder = new GeneratedKeyHolder();
 
-    }
+        jdbcTemplate.update(connection -> {
+            PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[]{"user_id"});
+            stmt.setString(1, user.getName());
+            stmt.setString(2, user.getEmail());
+            stmt.setString(3, user.getLogin());
+            stmt.setDate(4, Date.valueOf(user.getBirthday()));
+            return stmt;
+        }, keyHolder);
 
-    static User createUser(ResultSet rs, int rowNum) throws SQLException {
-        return User.builder()
-                .id(rs.getLong("id"))
-                .name(rs.getString("name"))
-                .login(rs.getString("login"))
-                .email(rs.getString("email"))
-                .birthday(rs.getDate("birthday").toLocalDate())
-                .build();
+        user.setId(keyHolder.getKey().longValue());
+        return Optional.of(user);
     }
 
     @Override
     public List<User> getAll() {
-        String sqlQuery = "select * from users";
-        return jdbcTemplate.query(sqlQuery, UserDbStorage::createUser);
+        String sqlQuery = "SELECT * FROM users";
+        return jdbcTemplate.query(sqlQuery, this::makeUser);
     }
 
     @Override
-    public List<Long> getIdUsers() {
-        String sqlQuery = "select id from users ";
-        List<Long> idUsers = jdbcTemplate.queryForList(sqlQuery, Long.class);
-        return idUsers;
+    public boolean deleteUser(User user) {
+        if (getById(user.getId()).isEmpty()) {
+            return false;
+        }
+        String sqlQuery = "DELETE FROM users WHERE user_id = ?";
+        return jdbcTemplate.update(sqlQuery, user.getId()) > 0;
     }
 
     @Override
-    public User getById(Long userId) {
-        String sqlQuery = "select * from users where id= ?";
-        User user = jdbcTemplate.queryForObject(sqlQuery, UserDbStorage::createUser, userId);
+    public Optional<User> getById(long userId) {
+        String sqlQuery = "SELECT * FROM users WHERE user_id = ?";
+        try {
+            return Optional.of(jdbcTemplate.queryForObject(sqlQuery, this::makeUser, userId));
+        } catch (EmptyResultDataAccessException e) {
+            log.warn("Пользователь № {} не найден", userId);
+            throw new UserNotFoundException(String.format("Пользователь № %d не найден", userId));
+        }
+    }
+
+
+    private User makeUser(ResultSet rs, int rowNum) throws SQLException {
+        User user = new User(rs.getString("email"), rs.getString("login"),
+                rs.getDate("birthday").toLocalDate());
+        user.setId(rs.getLong("user_id"));
+        user.setName(rs.getString("user_name"));
         return user;
     }
 }

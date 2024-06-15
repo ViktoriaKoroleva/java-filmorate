@@ -3,13 +3,14 @@ package ru.yandex.practicum.filmorate.service.user;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.controller.ValidatorControllers;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.friend.FriendStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
-import ru.yandex.practicum.filmorate.validation.ValidationException;
 
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -24,15 +25,16 @@ public class UserService {
     }
 
     public User createUser(User user) {
-        return userStorage.createUser(user);
+        user = ValidatorControllers.validateUser(user);
+        return userStorage.createUser(user).get();
     }
 
     public User update(User user) {
-        List<Long> idsUsersFromBd = userStorage.getIdUsers();
-        if (!(idsUsersFromBd.contains(user.getId()))) {
-            throw new ValidationException("В БД нет пользователя с таким id");
+        user = ValidatorControllers.validateUser(user);
+        if (getById(user.getId()) == null) {
+            return null;
         }
-        return userStorage.updateUser(user);
+        return userStorage.updateUser(user).get();
     }
 
     public List<User> getAll() {
@@ -40,54 +42,47 @@ public class UserService {
     }
 
     public User getById(Long id) {
-        return userStorage.getById(id);
+        return userStorage.getById(id).get();
     }
 
-
-    public void addFriendship(Long idUser, Long idFriend) {
-        List<Long> idsUsersFromBd = userStorage.getIdUsers();
-        if (!(idsUsersFromBd.contains(idUser))) {
-            throw new ValidationException("В бд нет пользователя с таким id=" + idUser);
+    public boolean deleteUser(User user) {
+        return userStorage.deleteUser(user);
+    }
+    public boolean addFriendship(long idUser, long idFriend) {
+        if ((getById(idUser) == null) || (getById(idFriend) == null)) {
+            return false;
         }
-        if (!(idsUsersFromBd.contains(idFriend))) {
-            throw new ValidationException("В бд нет пользователя с таким id=" + idFriend);
-        }
-        friendStorage.addFriend(idUser, idFriend);
-
+        User friendRequest = userStorage.getById(idUser).get();
+        User friendResponse = userStorage.getById(idFriend).get();
+        friendStorage.addFriend(friendRequest, friendResponse);
+        return true;
     }
 
-    public void removeFriend(Long userId, Long friendId) {
-        List<Long> idsUsersFromBd = userStorage.getIdUsers();
-        if (!(idsUsersFromBd.contains(userId))) {
-            throw new ValidationException("В бд нет пользователя с таким id=" + userId);
+    public boolean removeFriend(Long userId, Long friendId) {
+        if ((getById(userId) == null) || (getById(friendId) == null)) {
+            return false;
         }
-        if (!(idsUsersFromBd.contains(userId))) {
-            throw new ValidationException("В бд нет пользователя с таким id=" + userId);
-        }
-        friendStorage.removeFriend(userId, friendId);
+        User friendRequest = userStorage.getById(userId).get();
+        User friendResponse = userStorage.getById(friendId).get();
+        friendStorage.removeFriend(friendRequest, friendResponse);
+        return true;
     }
 
     public List<User> getUserFriends(Long userId) {
-        List<Long> idsUsersFromBd = userStorage.getIdUsers();
-        if (!(idsUsersFromBd.contains(userId))) {
-            throw new ValidationException("В бд нет пользователя с таким id=" + userId);
+        if (getById(userId) == null) {
+            return Collections.EMPTY_LIST;
         }
-        return new ArrayList<>(friendStorage.getFriends(userId).values());
+        return friendStorage.findFriends(userId).stream()
+                .map(this::getById)
+                .collect(Collectors.toList());
     }
 
     public List<User> findCommonFriends(Long idUser, Long idOtherUser) {
-        userStorage.getById(idUser);
-        userStorage.getById(idOtherUser);
-        Map<Long, User> userFriends = friendStorage.getFriends(idUser);
-        Map<Long, User> otherUserFriends = friendStorage.getFriends(idOtherUser);
-        List<User> commonFriends = new ArrayList<>();
-
-        for (Long idFriend : userFriends.keySet()) {
-            if (otherUserFriends.containsKey(idFriend)) {
-                commonFriends.add(userFriends.get(idFriend));
-            }
+        if ((getById(idUser) == null) || (getById(idOtherUser) == null)) {
+            return Collections.EMPTY_LIST;
         }
-
-        return commonFriends;
+        return getUserFriends(idUser).stream()
+                .filter(f -> getUserFriends(idOtherUser).contains(f))
+                .collect(Collectors.toList());
     }
 }
