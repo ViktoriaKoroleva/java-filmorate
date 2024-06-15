@@ -12,74 +12,76 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Service
 @Slf4j
+@Service
 @RequiredArgsConstructor
 public class UserService {
 
     private final UserStorage userStorage;
     private final FriendStorage friendStorage;
 
-    public User createUser(User user) {
+
+    public User create(User user) {
         user = ValidatorControllers.validateUser(user);
-        return userStorage.createUser(user).get();
+        return userStorage.create(user).get();
     }
 
     public User update(User user) {
         user = ValidatorControllers.validateUser(user);
-        if (getById(user.getId()) == null) {
+        if (findUserById(user.getId()) == null) {
             return null;
         }
-        return userStorage.updateUser(user).get();
+        return userStorage.update(user).get();
     }
 
-    public List<User> getAll() {
-        return new ArrayList<>(userStorage.getAll());
+    public boolean delete(User user) {
+        return userStorage.delete(user);
     }
 
-    public User getById(Long id) {
-        return userStorage.getById(id).get();
+    public List<User> findUsers() {
+        return userStorage.findUsers();
     }
 
-    public boolean deleteUser(User user) {
-        return userStorage.deleteUser(user);
+    public User findUserById(long userId) {
+        return userStorage.findUserById(userId).get();
     }
 
-    public boolean addFriendship(long idUser, long idFriend) {
-        if ((getById(idUser) == null) || (getById(idFriend) == null)) {
+    public boolean addInFriends(long id, long friendId) {
+        if ((findUserById(id) == null) || (findUserById(friendId) == null)) {
             return false;
         }
-        User friendRequest = userStorage.getById(idUser).get();
-        User friendResponse = userStorage.getById(idFriend).get();
-        friendStorage.addFriend(friendRequest, friendResponse);
+        User friendRequest = userStorage.findUserById(id).get();
+        User friendResponse = userStorage.findUserById(friendId).get();
+        friendStorage.addInFriends(friendRequest, friendResponse);
         return true;
     }
 
-    public boolean removeFriend(Long userId, Long friendId) {
-        if ((getById(userId) == null) || (getById(friendId) == null)) {
+    public boolean deleteFromFriends(long id, long friendId) {
+        if ((findUserById(id) == null) || (findUserById(friendId) == null)) {
             return false;
         }
-        User friendRequest = userStorage.getById(userId).get();
-        User friendResponse = userStorage.getById(friendId).get();
-        friendStorage.removeFriend(friendRequest, friendResponse);
+        User friendRequest = userStorage.findUserById(id).get();
+        User friendResponse = userStorage.findUserById(friendId).get();
+        friendStorage.deleteFromFriends(friendRequest, friendResponse);
         return true;
     }
 
-    public List<User> findFriends(Long userId) {
-        if (getById(userId) == null) {
+    public List<User> findFriends(long id) {
+        if (findUserById(id) == null) {
             return Collections.EMPTY_LIST;
         }
-        return friendStorage.findFriends(userId).stream()
-                .map(this::getById)
+        return friendStorage.findFriends(id).stream()
+                .map(this::findUserById)
                 .collect(Collectors.toList());
     }
 
-    public List<User> findCommonFriends(Long idUser, Long idOtherUser) {
-        if ((getById(idUser) == null) || (getById(idOtherUser) == null)) {
+    public List<User> findMutualFriends(long id, long otherId) {
+        if ((findUserById(id) == null) || (findUserById(otherId) == null)) {
             return Collections.EMPTY_LIST;
         }
-        return findFriends(idUser).stream()
-                .filter(f -> findFriends(idOtherUser).contains(f))
+        return findFriends(id).stream()
+                .filter(f -> findFriends(otherId).contains(f))
                 .collect(Collectors.toList());
     }
+
 }

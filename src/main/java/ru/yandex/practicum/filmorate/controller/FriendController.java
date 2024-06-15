@@ -20,12 +20,12 @@ public class FriendController {
 
     @PutMapping("/{id}/friends/{friendId}")
     public boolean addInFriends(@PathVariable long id, @PathVariable long friendId) {
-        return userService.addFriendship(id, friendId);
+        return userService.addInFriends(id, friendId);
     }
 
     @DeleteMapping("{id}/friends/{friendId}")
     public boolean deleteFromFriends(@PathVariable long id, @PathVariable long friendId) {
-        return userService.removeFriend(id, friendId);
+        return userService.deleteFromFriends(id, friendId);
     }
 
     @GetMapping("/{id}/friends")
@@ -35,7 +35,7 @@ public class FriendController {
 
     @GetMapping("/{id}/friends/common/{otherId}")
     public List<User> findMutualFriends(@PathVariable long id, @PathVariable long otherId) {
-        List<User> users = userService.findCommonFriends(id, otherId);
+        List<User> users = userService.findMutualFriends(id, otherId);
         log.debug("Получен список друзей пользователя");
         return users;
     }

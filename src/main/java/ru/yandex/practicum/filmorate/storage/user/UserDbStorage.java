@@ -23,20 +23,10 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Slf4j
 public class UserDbStorage implements UserStorage {
+
     private final JdbcTemplate jdbcTemplate;
 
-
-    @Override
-    public Optional<User> updateUser(User user) {
-        String sqlQuery = "update users set user_name = ?, email = ?, login = ?, birthday = ?" +
-                " where user_id = ?";
-        jdbcTemplate.update(sqlQuery, user.getName(), user.getEmail(), user.getLogin(),
-                user.getBirthday(), user.getId());
-        return Optional.of(user);
-    }
-
-    @Override
-    public Optional<User> createUser(User user) {
+    public Optional<User> create(User user) {
         String sqlQuery = "insert into users(user_name, email, login, birthday) values (?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -53,24 +43,29 @@ public class UserDbStorage implements UserStorage {
         return Optional.of(user);
     }
 
-    @Override
-    public List<User> getAll() {
-        String sqlQuery = "SELECT * FROM users";
-        return jdbcTemplate.query(sqlQuery, this::makeUser);
+    public Optional<User> update(User user) {
+        String sqlQuery = "update users set user_name = ?, email = ?, login = ?, birthday = ?" +
+                " where user_id = ?";
+        jdbcTemplate.update(sqlQuery, user.getName(), user.getEmail(), user.getLogin(),
+                user.getBirthday(), user.getId());
+        return Optional.of(user);
     }
 
-    @Override
-    public boolean deleteUser(User user) {
-        if (getById(user.getId()).isEmpty()) {
+    public boolean delete(User user) {
+        if (findUserById(user.getId()).isEmpty()) {
             return false;
         }
-        String sqlQuery = "DELETE FROM users WHERE user_id = ?";
+        String sqlQuery = "delete from users where user_id = ?";
         return jdbcTemplate.update(sqlQuery, user.getId()) > 0;
     }
 
-    @Override
-    public Optional<User> getById(long userId) {
-        String sqlQuery = "SELECT * FROM users WHERE user_id = ?";
+    public List<User> findUsers() {
+        String sqlQuery = "select * from users";
+        return jdbcTemplate.query(sqlQuery, this::makeUser);
+    }
+
+    public Optional<User> findUserById(long userId) {
+        String sqlQuery = "select * from users where user_id = ?";
         try {
             return Optional.of(jdbcTemplate.queryForObject(sqlQuery, this::makeUser, userId));
         } catch (EmptyResultDataAccessException e) {
@@ -86,4 +81,5 @@ public class UserDbStorage implements UserStorage {
         user.setName(rs.getString("user_name"));
         return user;
     }
+
 }

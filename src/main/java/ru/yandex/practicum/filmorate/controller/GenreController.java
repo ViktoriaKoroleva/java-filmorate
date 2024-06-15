@@ -23,13 +23,16 @@ public class GenreController {
 
     @GetMapping
     public List<Genre> findGenres() {
-        return filmService.findGenres();
+        List<Genre> genres = filmService.findGenres();
+        log.debug("Получен список жанров, количество = {}", genres.size());
+        return genres;
     }
 
     @GetMapping("/{id}")
     public Genre findGenreById(@PathVariable long id) {
-        return filmService.findGenreById(id);
+        Genre genre = filmService.findGenreById(id);
+        log.debug("Получен жанр с id = {}", id);
+        return genre;
     }
 
 }
-

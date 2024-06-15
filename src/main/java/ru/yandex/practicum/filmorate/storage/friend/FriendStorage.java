@@ -6,10 +6,11 @@ import ru.yandex.practicum.filmorate.model.User;
 import java.util.List;
 
 public interface FriendStorage {
-    boolean addFriend(User friendRequest, User friendResponse);
 
-    boolean removeFriend(User friendRequest, User friendResponse);
+    boolean addInFriends(User friendRequest, User friendResponse);
+
+    boolean deleteFromFriends(User friendRequest, User friendResponse);
 
     List<Long> findFriends(long id);
-}
 
+}

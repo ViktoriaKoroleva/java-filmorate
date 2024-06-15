@@ -25,10 +25,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 public class FilmDbStorage implements FilmStorage {
+
     private final JdbcTemplate jdbcTemplate;
 
-    @Override
-    public Optional<Film> createFilm(Film film) {
+    public Optional<Film> create(Film film) {
         String sqlQuery = "insert into films(film_name, description, release_date, duration, rate, rating_mpa_id) " +
                 " values (?, ?, ?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -46,9 +46,75 @@ public class FilmDbStorage implements FilmStorage {
         }, keyHolder);
 
         film.setId(keyHolder.getKey().longValue());
-        film.setMpa(ratingMPASearchById(film.getMpa().getId()).get());
+        film.setMpa(findRatingMPAById(film.getMpa().getId()).get());
         Film updateFilm = updateGenres(film);
         return Optional.of(updateFilm);
+    }
+
+    public Optional<Film> update(Film film) {
+        if (findFilmById(film.getId()) == null) {
+            return null;
+        }
+        String sqlQuery = "update films set film_name = ?, description = ?, release_date = ?, " +
+                "duration = ?, rate = ?, rating_mpa_id = ? where film_id = ?";
+        jdbcTemplate.update(sqlQuery, film.getName(), film.getDescription(), film.getReleaseDate(),
+                film.getDuration(), film.getRate(), film.getMpa().getId(), film.getId());
+
+        film.setMpa(findRatingMPAById(film.getMpa().getId()).get());
+        deleteGenres(film.getId());
+        film = updateGenres(film);
+        return Optional.of(film);
+    }
+
+    public boolean delete(Film film) {
+        if (findFilmById(film.getId()).isEmpty()) {
+            return false;
+        }
+        String sqlQuery = "delete from films where film_id = ?";
+        return jdbcTemplate.update(sqlQuery, film.getId()) > 0;
+    }
+
+    public List<Film> findFilms() {
+        String sqlQuery = "select * from films";
+        return jdbcTemplate.query(sqlQuery, this::makeFilm);
+    }
+
+    public Optional<Film> findFilmById(long filmId) {
+        String sqlQuery = "select * from films where film_id = ?";
+        try {
+            return Optional.of(jdbcTemplate.queryForObject(sqlQuery, this::makeFilm, filmId));
+        } catch (EmptyResultDataAccessException e) {
+            log.warn("Фильм № {} не найден", filmId);
+            throw new FilmNotFoundException(String.format("Фильм № %d не найден", filmId));
+        }
+    }
+
+    public List<Genre> findGenres() {
+        String sqlQuery = "select * from genres";
+        return jdbcTemplate.query(sqlQuery, this::makeGenre);
+    }
+
+    public Optional<Genre> findGenreById(long genreId) {
+        String sqlQuery = "select * from genres where genre_id = ?";
+        try {
+            return Optional.of(jdbcTemplate.queryForObject(sqlQuery, this::makeGenre, genreId));
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
+    }
+
+    public List<Mpa> findRatingMPAs() {
+        String sqlQuery = "select * from rating_mpa";
+        return jdbcTemplate.query(sqlQuery, this::makeRatingMPA);
+    }
+
+    public Optional<Mpa> findRatingMPAById(long ratingMPAId) {
+        String sqlQuery = "select * from rating_mpa where rating_mpa_id = ?";
+        try {
+            return Optional.of(jdbcTemplate.queryForObject(sqlQuery, this::makeRatingMPA, ratingMPAId));
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
     }
 
     private void createGenre(Long filmId, Genre genre) {
@@ -68,82 +134,9 @@ public class FilmDbStorage implements FilmStorage {
         return film;
     }
 
-    @Override
-    public Optional<Film> updateFilm(Film film) {
-        if (getFilmById(film.getId()) == null) {
-            return null;
-        }
-        String sqlQuery = "update films set film_name = ?, description = ?, release_date = ?, " +
-                "duration = ?, rate = ?, rating_mpa_id = ? where film_id = ?";
-        jdbcTemplate.update(sqlQuery, film.getName(), film.getDescription(), film.getReleaseDate(),
-                film.getDuration(), film.getRate(), film.getMpa().getId(), film.getId());
-
-        film.setMpa(ratingMPASearchById(film.getMpa().getId()).get());
-        deleteGenres(film.getId());
-        film = updateGenres(film);
-        return Optional.of(film);
-    }
-
-    @Override
-    public boolean deleteFilm(Film film) {
-        if (getFilmById(film.getId()).isEmpty()) {
-            return false;
-        }
-        String sqlQuery = "delete from films where film_id = ?";
-        return jdbcTemplate.update(sqlQuery, film.getId()) > 0;
-
-    }
-
     private void deleteGenres(Long filmId) {
         String sqlQuery = "delete from film_genre where film_id = ?";
         jdbcTemplate.update(sqlQuery, filmId);
-    }
-
-    @Override
-    public List<Film> getAll() {
-        String sqlQuery = "select * from films";
-        return jdbcTemplate.query(sqlQuery, this::makeFilm);
-    }
-
-    @Override
-    public Optional<Film> getFilmById(long filmId) {
-        String sqlQuery = "select * from films where film_id = ?";
-        try {
-            return Optional.of(jdbcTemplate.queryForObject(sqlQuery, this::makeFilm, filmId));
-        } catch (EmptyResultDataAccessException e) {
-            throw new FilmNotFoundException(String.format("Фильм № %d не найден", filmId));
-        }
-    }
-
-    @Override
-    public List<Genre> findGenres() {
-        String sqlQuery = "select * from genres";
-        return jdbcTemplate.query(sqlQuery, this::makeGenre);
-    }
-
-    public Optional<Genre> findGenreById(long genreId) {
-        String sqlQuery = "select * from genres where genre_id = ?";
-        try {
-            return Optional.of(jdbcTemplate.queryForObject(sqlQuery, this::makeGenre, genreId));
-        } catch (EmptyResultDataAccessException e) {
-            return Optional.empty();
-        }
-    }
-
-    @Override
-    public List<Mpa> ratingMPASearch() {
-        String sqlQuery = "select * from rating_mpa";
-        return jdbcTemplate.query(sqlQuery, this::makeRatingMPA);
-
-    }
-
-    public Optional<Mpa> ratingMPASearchById(long ratIdMpa) {
-        String sqlQuery = "select * from rating_mpa where rating_mpa_id = ?";
-        try {
-            return Optional.of(jdbcTemplate.queryForObject(sqlQuery, this::makeRatingMPA, ratIdMpa));
-        } catch (EmptyResultDataAccessException e) {
-            return Optional.empty();
-        }
     }
 
     private List<Genre> findGenresByFilmId(Long filmId) {
@@ -160,7 +153,7 @@ public class FilmDbStorage implements FilmStorage {
         film.setDuration(rs.getInt("duration"));
         film.setRate(rs.getInt("rate"));
         film.setGenres(new HashSet<>(findGenresByFilmId(film.getId())));
-        film.setMpa(ratingMPASearchById(rs.getLong("rating_mpa_id")).get());
+        film.setMpa(findRatingMPAById(rs.getLong("rating_mpa_id")).get());
         return film;
     }
 

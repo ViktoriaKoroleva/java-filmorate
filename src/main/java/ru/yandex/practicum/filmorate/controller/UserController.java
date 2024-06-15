@@ -16,32 +16,44 @@ import java.util.List;
 @Validated
 @RequiredArgsConstructor
 public class UserController {
-    private UserService userService;
+
+    private final UserService userService;
 
     @PostMapping
-    public User createUser(@RequestBody @Valid User user) {
-        return userService.createUser(user);
+    @Validated
+    public User create(@Valid @RequestBody User user) {
+        User newUser = userService.create(user);
+        log.debug("Добавлен новый пользователь");
+        return newUser;
     }
 
     @PutMapping
+    @Validated
     public User update(@Valid @RequestBody User user) {
-        return userService.update(user);
-    }
-
-    @GetMapping
-    public List<User> getAll() {
-        return userService.getAll();
-    }
-
-    @GetMapping("/{userId}")
-    public User getUserById(@PathVariable Long userId) {
-        return userService.getById(userId);
+        User newUser = userService.update(user);
+        log.debug("Обновлен пользователь");
+        return newUser;
     }
 
     @DeleteMapping
     @Validated
-    public void deleteUser(@Valid @RequestBody User user) {
-        userService.deleteUser(user);
+    public void delete(@Valid @RequestBody User user) {
+        userService.delete(user);
         log.debug("Удалён пользователь: {}", user);
     }
+
+    @GetMapping
+    public List<User> findUsers() {
+        List<User> users = userService.findUsers();
+        log.debug("Получен список пользователей");
+        return users;
+    }
+
+    @GetMapping("/{userId}")
+    public User findUserById(@PathVariable long userId) {
+        User user = userService.findUserById(userId);
+        log.debug("Получен пользователь");
+        return user;
+    }
+
 }
