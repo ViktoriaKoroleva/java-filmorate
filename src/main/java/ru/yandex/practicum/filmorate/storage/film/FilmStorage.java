@@ -13,7 +13,7 @@ public interface FilmStorage {
 
     Optional<Film> updateFilm(Film film);
 
-    List<Film> findFilms();
+    List<Film> getAll();
 
     List<Mpa> ratingMPASearch();
 

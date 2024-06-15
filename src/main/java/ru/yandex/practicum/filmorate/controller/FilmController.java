@@ -23,12 +23,12 @@ public class FilmController {
 
     @GetMapping("/{filmId}")
     public Film getById(@PathVariable long filmId) {
-        return filmService.findFilmById(filmId);
+        return filmService.getFilmById(filmId);
     }
 
     @GetMapping
     public List<Film> getAll() {
-        return filmService.findFilms();
+        return filmService.getAll();
     }
 
     @PostMapping
@@ -49,16 +49,6 @@ public class FilmController {
     @DeleteMapping("/{filmId}/like/{userId}")
     public void deleteLike(@PathVariable long filmId, @PathVariable long userId) {
         filmService.deleteLike(filmId, userId);
-    }
-
-    @GetMapping
-    public List<Film> findFilms() {
-        return filmService.findFilms();
-    }
-
-    @GetMapping("/{filmId}")
-    public Film findFilmById(@PathVariable long filmId) {
-        return filmService.findFilmById(filmId);
     }
 
     @GetMapping("/popular")

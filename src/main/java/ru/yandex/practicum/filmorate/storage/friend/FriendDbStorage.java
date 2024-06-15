@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.storage.friend;
 
-import org.springframework.stereotype.Component;
 import org.springframework.jdbc.core.JdbcTemplate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -12,7 +11,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FriendDbStorage implements FriendStorage {
     private final JdbcTemplate jdbcTemplate;
-
 
     @Override
     public boolean addFriend(User friendRequest, User friendResponse) {

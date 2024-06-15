@@ -34,16 +34,18 @@ public class FilmService {
         ValidatorControllers.validateFilm(film);
         return filmStorage.updateFilm(film).get();
     }
+
     public boolean deleteFilm(Film film) {
         return filmStorage.deleteFilm(film);
     }
-    public List<Film> findFilms() {
-        return filmStorage.findFilms().stream()
+
+    public List<Film> getAll() {
+        return filmStorage.getAll().stream()
                 .peek(film -> film.setLikes(new HashSet<>(likeStorage.findLikes(film))))
                 .collect(Collectors.toList());
     }
 
-    public Film findFilmById(long filmId) {
+    public Film getFilmById(long filmId) {
         return filmStorage.getFilmById(filmId).stream()
                 .peek(f -> f.setLikes(new HashSet<>(likeStorage.findLikes(f))))
                 .findFirst().get();
@@ -70,11 +72,11 @@ public class FilmService {
     }
 
     public boolean deleteLike(long id, long userId) {
-        if (findFilmById(id) == null || userStorage.getById(userId).isEmpty()) {
+        if (getFilmById(id) == null || userStorage.getById(userId).isEmpty()) {
             return false;
         }
 
-        Film film = findFilmById(id);
+        Film film = getFilmById(id);
         film.getLikes().remove(userId);
         likeStorage.dislike(film);
         likeStorage.like(film);
@@ -86,11 +88,11 @@ public class FilmService {
     }
 
     public boolean addLike(long id, long userId) {
-        if (findFilmById(id) == null || userStorage.getById(userId).isEmpty()) {
+        if (getFilmById(id) == null || userStorage.getById(userId).isEmpty()) {
             return false;
         }
 
-        Film film = findFilmById(id);
+        Film film = getFilmById(id);
         film.getLikes().add(userId);
         likeStorage.dislike(film);
         likeStorage.like(film);
@@ -105,7 +107,7 @@ public class FilmService {
             throw new ValidationException(message);
         }
 
-        return findFilms().stream()
+        return getAll().stream()
                 .sorted(this::compare)
                 .limit(countInt)
                 .collect(Collectors.toList());

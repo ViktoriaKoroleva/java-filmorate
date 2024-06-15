@@ -79,7 +79,6 @@ public class UserDbStorage implements UserStorage {
         }
     }
 
-
     private User makeUser(ResultSet rs, int rowNum) throws SQLException {
         User user = new User(rs.getString("email"), rs.getString("login"),
                 rs.getDate("birthday").toLocalDate());

@@ -48,6 +48,7 @@ public class UserService {
     public boolean deleteUser(User user) {
         return userStorage.deleteUser(user);
     }
+
     public boolean addFriendship(long idUser, long idFriend) {
         if ((getById(idUser) == null) || (getById(idFriend) == null)) {
             return false;
