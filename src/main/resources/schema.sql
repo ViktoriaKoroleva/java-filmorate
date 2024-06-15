@@ -54,3 +54,18 @@ CREATE TABLE IF NOT EXISTS likes
 );
 create unique index if not exists USER_EMAIL_UINDEX on USERS (email);
 create unique index if not exists USER_LOGIN_UINDEX on USERS (login);
+
+INSERT INTO genres(genre_name)
+VALUES ('Комедия'),
+       ('Драма'),
+       ('Мультфильм'),
+       ('Триллер'),
+       ('Документальный'),
+       ('Боевик');
+
+INSERT INTO rating_mpa(rating_mpa_name, description)
+VALUES ('G', 'у фильма нет возрастных ограничений'),
+       ('PG', 'детям рекомендуется смотреть фильм с родителями'),
+       ('PG-13', 'детям до 13 лет просмотр не желателен'),
+       ('R', 'лицам до 17 лет просматривать фильм можно только в присутствии взрослого'),
+       ('NC-17', 'лицам до 18 лет просмотр запрещён');

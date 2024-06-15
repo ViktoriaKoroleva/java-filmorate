@@ -44,10 +44,4 @@ public class UserController {
         userService.deleteUser(user);
         log.debug("Удалён пользователь: {}", user);
     }
-
-    @GetMapping("/{userId}/friends/common/{friendId}")
-    public List<User> findCommonFriends(@PathVariable Long userId, @PathVariable Long friendId) {
-        return userService.findCommonFriends(userId, friendId);
-    }
-
 }

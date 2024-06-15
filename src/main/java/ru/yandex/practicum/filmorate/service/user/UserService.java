@@ -65,7 +65,7 @@ public class UserService {
         return true;
     }
 
-    public List<User> getUserFriends(Long userId) {
+    public List<User> findFriends(Long userId) {
         if (getById(userId) == null) {
             return Collections.EMPTY_LIST;
         }
@@ -78,8 +78,8 @@ public class UserService {
         if ((getById(idUser) == null) || (getById(idOtherUser) == null)) {
             return Collections.EMPTY_LIST;
         }
-        return getUserFriends(idUser).stream()
-                .filter(f -> getUserFriends(idOtherUser).contains(f))
+        return findFriends(idUser).stream()
+                .filter(f -> findFriends(idOtherUser).contains(f))
                 .collect(Collectors.toList());
     }
 }
