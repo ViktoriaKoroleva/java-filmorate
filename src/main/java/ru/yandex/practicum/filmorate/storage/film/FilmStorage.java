@@ -9,22 +9,22 @@ import java.util.Optional;
 
 public interface FilmStorage {
 
-    Optional<Film> create(Film film);
-
-    Optional<Film> update(Film film);
-
-    boolean delete(Film film);
+    Optional<Film> createFilm(Film film);
 
     List<Film> findFilms();
 
     Optional<Film> findFilmById(long filmId);
 
-    List<Genre> findGenres();
+    List<Genre> getAllGenres();
 
-    Optional<Genre> findGenreById(long genreId);
+    Optional<Film> updateFilm(Film film);
 
-    List<Mpa> findRatingMPAs();
+    boolean deleteFilm(Film film);
 
-    Optional<Mpa> findRatingMPAById(long ratingMPAId);
+    Optional<Genre> getGenreById(long genreId);
+
+    List<Mpa> getAllRatingMPAs();
+
+    Optional<Mpa> getRatingMPAById(long ratingMPAId);
 
 }

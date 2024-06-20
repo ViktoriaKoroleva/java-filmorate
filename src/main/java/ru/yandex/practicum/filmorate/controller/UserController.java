@@ -21,24 +21,24 @@ public class UserController {
 
     @PostMapping
     @Validated
-    public User create(@Valid @RequestBody User user) {
-        User newUser = userService.create(user);
+    public User createUser(@Valid @RequestBody User user) {
+        User newUser = userService.createUser(user);
         log.debug("Добавлен новый пользователь");
         return newUser;
     }
 
     @PutMapping
     @Validated
-    public User update(@Valid @RequestBody User user) {
-        User newUser = userService.update(user);
+    public User updateUser(@Valid @RequestBody User user) {
+        User newUser = userService.updateUser(user);
         log.debug("Обновлен пользователь");
         return newUser;
     }
 
     @DeleteMapping
     @Validated
-    public void delete(@Valid @RequestBody User user) {
-        userService.delete(user);
+    public void deleteUser(@Valid @RequestBody User user) {
+        userService.deleteUser(user);
         log.debug("Удалён пользователь: {}", user);
     }
 

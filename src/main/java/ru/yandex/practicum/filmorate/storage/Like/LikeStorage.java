@@ -8,8 +8,8 @@ public interface LikeStorage {
 
     boolean like(Film film);
 
-    boolean dislike(Film film);
-
     List<Long> findLikes(Film film);
+
+    boolean dislike(Film film);
 
 }

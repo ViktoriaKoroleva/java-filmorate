@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.service.film;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.controller.ValidatorControllers;
+import ru.yandex.practicum.filmorate.controller.ValidationControllers;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
@@ -27,18 +27,18 @@ public class FilmService {
     private final UserStorage userStorage;
     private final LikeStorage likeStorage;
 
-    public Film create(Film film) {
-        film = ValidatorControllers.validateFilm(film);
-        return filmStorage.create(film).get();
+    public Film createFilm(Film film) {
+        film = ValidationControllers.validateFilm(film);
+        return filmStorage.createFilm(film).get();
     }
 
-    public Film update(Film film) {
-        ValidatorControllers.validateFilm(film);
-        return filmStorage.update(film).get();
+    public Film updateFilm(Film film) {
+        ValidationControllers.validateFilm(film);
+        return filmStorage.updateFilm(film).get();
     }
 
-    public boolean delete(Film film) {
-        return filmStorage.delete(film);
+    public boolean deleteFilm(Film film) {
+        return filmStorage.deleteFilm(film);
     }
 
     public List<Film> findFilms() {
@@ -53,7 +53,7 @@ public class FilmService {
                 .findFirst().get();
     }
 
-    public boolean like(long id, long userId) {
+    public boolean addLike(long id, long userId) {
         if (findFilmById(id) == null || userStorage.findUserById(userId).isEmpty()) {
             return false;
         }
@@ -77,7 +77,7 @@ public class FilmService {
         return true;
     }
 
-    public List<Film> findPopularFilms(String count) {
+    public List<Film> getPopularFilms(String count) {
         int countInt = Integer.parseInt(count);
         if (countInt < 0) {
             String message = "Параметр count не может быть отрицательным!";
@@ -91,24 +91,24 @@ public class FilmService {
                 .collect(Collectors.toList());
     }
 
-    public List<Genre> findGenres() {
-        return filmStorage.findGenres();
+    public List<Genre> getAllGenres() {
+        return filmStorage.getAllGenres();
     }
 
-    public Genre findGenreById(long genreId) {
-        return filmStorage.findGenreById(genreId)
+    public Genre getGenreById(long genreId) {
+        return filmStorage.getGenreById(genreId)
                 .orElseThrow(() -> {
                     log.warn("Жанр № {} не найден", genreId);
                     throw new GenreNotFoundException(String.format("Жанр № %d не найден", genreId));
                 });
     }
 
-    public List<Mpa> findRatingMPAs() {
-        return filmStorage.findRatingMPAs();
+    public List<Mpa> getAllRatingMPAs() {
+        return filmStorage.getAllRatingMPAs();
     }
 
-    public Mpa findRatingMPAById(long ratingMPAId) {
-        return filmStorage.findRatingMPAById(ratingMPAId)
+    public Mpa getRatingMPAById(long ratingMPAId) {
+        return filmStorage.getRatingMPAById(ratingMPAId)
                 .orElseThrow(() -> {
                     log.warn("Рейтинг МПА № {} не найден", ratingMPAId);
                     throw new MPANotFoundException(String.format("Рейтинг МПА № %d не найден", ratingMPAId));

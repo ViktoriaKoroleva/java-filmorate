@@ -20,23 +20,21 @@ public class FriendController {
 
     @PutMapping("/{id}/friends/{friendId}")
     public boolean addInFriends(@PathVariable long id, @PathVariable long friendId) {
-        return userService.addInFriends(id, friendId);
+        return userService.addFriendship(id, friendId);
     }
 
     @DeleteMapping("{id}/friends/{friendId}")
     public boolean deleteFromFriends(@PathVariable long id, @PathVariable long friendId) {
-        return userService.deleteFromFriends(id, friendId);
+        return userService.deleteFriendship(id, friendId);
     }
 
     @GetMapping("/{id}/friends")
-    public List<User> findFriends(@PathVariable long id) {
-        return userService.findFriends(id);
+    public List<User> getFriendsById(@PathVariable long id) {
+        return userService.getFriendsById(id);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
-    public List<User> findMutualFriends(@PathVariable long id, @PathVariable long otherId) {
-        List<User> users = userService.findMutualFriends(id, otherId);
-        log.debug("Получен список друзей пользователя");
-        return users;
+    public List<User> getMutualFriendsByIds(@PathVariable long id, @PathVariable long otherId) {
+        return userService.getMutualFriendsByIds(id, otherId);
     }
 }

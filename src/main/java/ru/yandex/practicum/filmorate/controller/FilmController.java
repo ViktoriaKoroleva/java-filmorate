@@ -21,56 +21,46 @@ public class FilmController {
 
     @DeleteMapping
     @Validated
-    public void delete(@Valid @RequestBody Film film) {
-        filmService.delete(film);
-        log.debug("Удалён фильм: {}", film);
+    public void deleteFilm(@Valid @RequestBody Film film) {
+        filmService.deleteFilm(film);
     }
 
     @PostMapping
     @Validated
-    public Film create(@Valid @RequestBody Film film) {
-        Film newFilm = filmService.create(film);
-        log.debug("Добавлен новый фильм: {}", newFilm);
-        return newFilm;
+    public Film createFilm(@Valid @RequestBody Film film) {
+        return filmService.createFilm(film);
     }
 
     @PutMapping
     @Validated
-    public Film update(@Valid @RequestBody Film film) {
-        Film newFilm = filmService.update(film);
-        log.debug("Обновлен фильм: {}", newFilm);
-        return newFilm;
+    public Film updateFilm(@Valid @RequestBody Film film) {
+        return filmService.updateFilm(film);
     }
 
     @GetMapping
     public List<Film> findFilms() {
-        List<Film> films = filmService.findFilms();
-        log.debug("Получен список фильмов, количество = {}", films.size());
-        return films;
+        return filmService.findFilms();
     }
 
     @GetMapping("/{filmId}")
     public Film findFilmById(@PathVariable long filmId) {
-        Film film = filmService.findFilmById(filmId);
-        log.debug("Получен фильм с id = {}", filmId);
-        return film;
+        return filmService.findFilmById(filmId);
     }
 
     @PutMapping("/{id}/like/{userId}")
-    public boolean like(@PathVariable long id, @PathVariable long userId) {
+    public boolean addLike(@PathVariable long id, @PathVariable long userId) {
         log.debug("Пользователь id = {} желает лайкнуть фильм id = {}", userId, id);
-        return filmService.like(id, userId);
+        return filmService.addLike(id, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
     public boolean dislike(@PathVariable long id, @PathVariable long userId) {
-        log.debug("Пользователь id = {} желает удалить лайк с фильма id = {}", userId, id);
         return filmService.dislike(id, userId);
     }
 
     @GetMapping("/popular")
-    public List<Film> findPopularFilms(@RequestParam(defaultValue = "10") String count) {
-        return filmService.findPopularFilms(count);
+    public List<Film> getPopularFilms(@RequestParam(defaultValue = "10") String count) {
+        return filmService.getPopularFilms(count);
     }
 
 }

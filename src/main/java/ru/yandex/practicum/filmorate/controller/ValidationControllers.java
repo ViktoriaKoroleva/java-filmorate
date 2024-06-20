@@ -10,11 +10,11 @@ import java.time.LocalDate;
 
 @NoArgsConstructor
 @Slf4j
-public class ValidatorControllers {
+public class ValidationControllers {
 
     public static Film validateFilm(Film film) {
-        ValidatorControllers.validateName(film.getName());
-        ValidatorControllers.validateReleaseDate(film.getReleaseDate());
+        ValidationControllers.validateName(film.getName());
+        ValidationControllers.validateReleaseDate(film.getReleaseDate());
         return film;
     }
 
@@ -31,9 +31,9 @@ public class ValidatorControllers {
     }
 
     public static User validateUser(User user) {
-        ValidatorControllers.validateLogin(user.getLogin());
+        ValidationControllers.validateLogin(user.getLogin());
         user = validateUserName(user);
-        ValidatorControllers.validateBirthday(user.getBirthday());
+        ValidationControllers.validateBirthday(user.getBirthday());
         return user;
     }
 

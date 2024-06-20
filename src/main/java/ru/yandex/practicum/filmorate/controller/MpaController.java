@@ -21,17 +21,13 @@ public class MpaController {
     private final FilmService filmService;
 
     @GetMapping
-    public List<Mpa> findRatingMPAs() {
-        List<Mpa> ratingMpas = filmService.findRatingMPAs();
-        log.debug("Получен список рейтингов");
-        return ratingMpas;
+    public List<Mpa> getAllRatingMPAs() {
+        return filmService.getAllRatingMPAs();
     }
 
     @GetMapping("/{id}")
-    public Mpa findRatingMPAById(@PathVariable long id) {
-        Mpa ratingMpa = filmService.findRatingMPAById(id);
-        log.debug("Получен рейтинг МПА");
-        return ratingMpa;
+    public Mpa getRatingMPAById(@PathVariable long id) {
+        return filmService.getRatingMPAById(id);
     }
 }
 

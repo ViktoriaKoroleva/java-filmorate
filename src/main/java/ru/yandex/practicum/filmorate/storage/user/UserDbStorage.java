@@ -26,7 +26,7 @@ public class UserDbStorage implements UserStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
-    public Optional<User> create(User user) {
+    public Optional<User> createUser(User user) {
         String sqlQuery = "insert into users(user_name, email, login, birthday) values (?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -43,7 +43,7 @@ public class UserDbStorage implements UserStorage {
         return Optional.of(user);
     }
 
-    public Optional<User> update(User user) {
+    public Optional<User> updateUser(User user) {
         String sqlQuery = "update users set user_name = ?, email = ?, login = ?, birthday = ?" +
                 " where user_id = ?";
         jdbcTemplate.update(sqlQuery, user.getName(), user.getEmail(), user.getLogin(),
@@ -51,7 +51,7 @@ public class UserDbStorage implements UserStorage {
         return Optional.of(user);
     }
 
-    public boolean delete(User user) {
+    public boolean deleteUser(User user) {
         if (findUserById(user.getId()).isEmpty()) {
             return false;
         }
@@ -61,20 +61,20 @@ public class UserDbStorage implements UserStorage {
 
     public List<User> findUsers() {
         String sqlQuery = "select * from users";
-        return jdbcTemplate.query(sqlQuery, this::makeUser);
+        return jdbcTemplate.query(sqlQuery, this::mapUser);
     }
 
     public Optional<User> findUserById(long userId) {
         String sqlQuery = "select * from users where user_id = ?";
         try {
-            return Optional.of(jdbcTemplate.queryForObject(sqlQuery, this::makeUser, userId));
+            return Optional.of(jdbcTemplate.queryForObject(sqlQuery, this::mapUser, userId));
         } catch (EmptyResultDataAccessException e) {
             log.warn("Пользователь № {} не найден", userId);
             throw new UserNotFoundException(String.format("Пользователь № %d не найден", userId));
         }
     }
 
-    private User makeUser(ResultSet rs, int rowNum) throws SQLException {
+    private User mapUser(ResultSet rs, int rowNum) throws SQLException {
         User user = new User(rs.getString("email"), rs.getString("login"),
                 rs.getDate("birthday").toLocalDate());
         user.setId(rs.getLong("user_id"));

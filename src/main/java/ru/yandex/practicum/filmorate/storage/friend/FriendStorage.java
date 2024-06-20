@@ -7,10 +7,10 @@ import java.util.List;
 
 public interface FriendStorage {
 
-    boolean addInFriends(User friendRequest, User friendResponse);
+    boolean addFriendship(User friendRequest, User friendResponse);
 
-    boolean deleteFromFriends(User friendRequest, User friendResponse);
+    boolean deleteFriendship(User friendRequest, User friendResponse);
 
-    List<Long> findFriends(long id);
+    List<Long> getFriendsById(long id);
 
 }
