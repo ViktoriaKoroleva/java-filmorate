@@ -14,7 +14,7 @@ public class Film {
     private long id;
 
     @NonNull
-    @NotBlank(message = "Ошибка! Название не может быть пустым.")
+    @NotBlank(message = "Ошибка Название не может быть пустым.")
     private String name;
     @NonNull
     @Size(max = 200)
@@ -24,7 +24,7 @@ public class Film {
     private LocalDate releaseDate;
     @NotNull
     private Mpa mpa;
-    @Positive(message = "Ошибка! Продолжительность фильма должна быть положительной.")
+    @Positive(message = "Ошибка Продолжительность фильма должна быть положительной.")
     private int duration;
 
     private int rate;

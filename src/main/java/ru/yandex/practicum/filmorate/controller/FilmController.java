@@ -49,7 +49,7 @@ public class FilmController {
 
     @PutMapping("/{id}/like/{userId}")
     public boolean addLike(@PathVariable long id, @PathVariable long userId) {
-        log.debug("Пользователь id = {} желает лайкнуть фильм id = {}", userId, id);
+        log.debug("Пользователь id = {} желает лайкнуь фильм id = {}", userId, id);
         return filmService.addLike(id, userId);
     }
 

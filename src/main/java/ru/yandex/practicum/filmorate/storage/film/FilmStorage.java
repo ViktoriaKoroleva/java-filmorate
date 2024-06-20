@@ -13,12 +13,6 @@ public interface FilmStorage {
 
     List<Film> findFilms();
 
-    Optional<Film> findFilmById(long filmId);
-
-    List<Genre> getAllGenres();
-
-    Optional<Film> updateFilm(Film film);
-
     boolean deleteFilm(Film film);
 
     Optional<Genre> getGenreById(long genreId);
@@ -26,5 +20,12 @@ public interface FilmStorage {
     List<Mpa> getAllRatingMPAs();
 
     Optional<Mpa> getRatingMPAById(long ratingMPAId);
+
+    Optional<Film> findFilmById(long filmId);
+
+    List<Genre> getAllGenres();
+
+    Optional<Film> updateFilm(Film film);
+
 
 }

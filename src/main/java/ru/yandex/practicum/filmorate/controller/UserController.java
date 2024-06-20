@@ -23,7 +23,7 @@ public class UserController {
     @Validated
     public User createUser(@Valid @RequestBody User user) {
         User newUser = userService.createUser(user);
-        log.debug("Добавлен новый пользователь");
+        log.debug("Добавлен пользователь");
         return newUser;
     }
 
