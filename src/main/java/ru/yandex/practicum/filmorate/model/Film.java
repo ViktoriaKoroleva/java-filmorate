@@ -1,39 +1,40 @@
 package ru.yandex.practicum.filmorate.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import lombok.*;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
-@Getter
-@Setter
-@ToString
-@EqualsAndHashCode(of = {"id"})
-@Builder
+@Data
 public class Film {
-    private Integer id;
 
-    private final Set<Integer> like = new HashSet<>();
-    @NotBlank(message = "Название фильма не может быть пустым.")
+    private long id;
+
+    @NonNull
+    @NotBlank(message = "Ошибка Название не может быть пустым.")
     private String name;
-
-    @NotBlank(message = "Описание фильма не может быть пустым")
-    @Size(max = 200, message = "Длина описания фильма не должна превышать 200 символов.")
+    @NonNull
+    @Size(max = 200)
     private String description;
-
-    @NotNull(message = "Дата релиза не может быть пустой.")
+    @NonNull
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate releaseDate;
-
-    @Positive(message = "Продолжительность фильма должна быть положительной.")
+    @NotNull
+    private Mpa mpa;
+    @Positive(message = "Ошибка Продолжительность фильма должна быть положительной.")
     private int duration;
 
-    @AssertTrue(message = "Дата релиза фильма должна быть не раньше 28 декабря 1895 года.")
-    @JsonIgnore
-    public boolean isReleaseDateValid() {
-        return releaseDate != null && !releaseDate.isBefore(LocalDate.of(1895, 12, 28));
+    private int rate;
+    private Set<Long> likes = new HashSet<>();
+    private Set<Genre> genres = new TreeSet<>(Comparator.comparingLong(Genre::getId));
+
+    @JsonSetter
+    public void setGenres(Set<Genre> genres) {
+        this.genres.clear();
+        this.genres.addAll(genres);
     }
 
 }

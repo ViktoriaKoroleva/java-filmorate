@@ -3,14 +3,13 @@ package ru.yandex.practicum.filmorate.service.user;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.controller.ValidationControllers;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.friend.FriendStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
-import ru.yandex.practicum.filmorate.validation.NotFoundException;
 
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -19,62 +18,70 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserStorage userStorage;
+    private final FriendStorage friendStorage;
+
 
     public User createUser(User user) {
-        return userStorage.createUser(user);
+        user = ValidationControllers.validateUser(user);
+        return userStorage.createUser(user).get();
     }
 
-    public User update(User user) {
-        return userStorage.updateUser(user);
-    }
-
-    public List<User> getAll() {
-        return userStorage.getAll();
-    }
-
-    public User getById(Integer id) {
-        return userStorage.getById(id);
-    }
-
-    public void deleteById(Integer id) {
-        userStorage.deleteById(id);
-    }
-
-    public User addFriendship(Integer id, Integer friendId) {
-        if (!userStorage.isUserExist(id) && !userStorage.isUserExist(friendId)) {
-            throw new IllegalArgumentException("Некорректные id пользователя или друга.");
+    public User updateUser(User user) {
+        user = ValidationControllers.validateUser(user);
+        if (findUserById(user.getId()) == null) {
+            return null;
         }
-        User user = getById(id);
-        User friend = getById(friendId);
-        user.getFriends().add(friendId);
-        friend.getFriends().add(id);
-        return user;
+        return userStorage.updateUser(user).get();
     }
 
-    public User removeFriend(Integer userId, Integer friendId) {
-        if (!userStorage.isUserExist(userId) && !userStorage.isUserExist(friendId)) {
-            throw new IllegalArgumentException("Некорректные id пользователя или друга.");
-        }
-        getById(userId).getFriends().remove(friendId);
-        getById(friendId).getFriends().remove(userId);
-        return getById(userId);
+    public boolean deleteUser(User user) {
+        return userStorage.deleteUser(user);
     }
 
-    public List<User> getUserFriends(Integer userId) {
-        if (!userStorage.isUserExist(userId)) {
-            throw new NotFoundException("Некорректный id пользователя.");
+    public List<User> findUsers() {
+        return userStorage.findUsers();
+    }
+
+    public User findUserById(long userId) {
+        return userStorage.findUserById(userId).get();
+    }
+
+    public boolean addFriendship(long id, long friendId) {
+        if (Objects.isNull(findUserById(id)) || Objects.isNull(findUserById(friendId))) {
+            return false;
         }
-        return getById(userId).getFriends().stream()
-                .map(this::getById)
+        User friendRequest = userStorage.findUserById(id).get();
+        User friendResponse = userStorage.findUserById(friendId).get();
+        friendStorage.addFriendship(friendRequest, friendResponse);
+        return true;
+    }
+
+    public boolean deleteFriendship(long id, long friendId) {
+        if (Objects.isNull(findUserById(id)) || Objects.isNull(findUserById(friendId))) {
+            return false;
+        }
+        User friendRequest = userStorage.findUserById(id).get();
+        User friendResponse = userStorage.findUserById(friendId).get();
+        friendStorage.deleteFriendship(friendRequest, friendResponse);
+        return true;
+    }
+
+    public List<User> getFriendsById(long id) {
+        if (findUserById(id) == null) {
+            return Collections.EMPTY_LIST;
+        }
+        return friendStorage.getFriendsById(id).stream()
+                .map(this::findUserById)
                 .collect(Collectors.toList());
     }
 
-    public List<User> findCommonFriends(Integer userId, Integer friendId) {
-        if (!userStorage.isUserExist(userId) && !userStorage.isUserExist(friendId)) {
-            throw new IllegalArgumentException("Некорректные id пользователя или друга.");
+    public List<User> getMutualFriendsByIds(long id, long otherId) {
+        if ((findUserById(id) == null) || (findUserById(otherId) == null)) {
+            return Collections.EMPTY_LIST;
         }
-        Set<Integer> mutualFriends = new HashSet<>(getById(userId).getFriends());
-        mutualFriends.retainAll(getById(friendId).getFriends());
-        return mutualFriends.stream().map(this::getById).collect(Collectors.toList());
+        return getFriendsById(id).stream()
+                .filter(f -> getFriendsById(otherId).contains(f))
+                .collect(Collectors.toList());
     }
+
 }
