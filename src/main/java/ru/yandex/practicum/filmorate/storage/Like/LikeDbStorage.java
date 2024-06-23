@@ -16,25 +16,33 @@ public class LikeDbStorage implements LikeStorage {
     private final JdbcTemplate jdbcTemplate;
 
     public boolean like(Film film) {
-
         for (long idUser : film.getLikes()) {
-            String sqlQuery = "insert into likes(user_id, film_id) " +
-                    " values (?, ?)";
-            jdbcTemplate.update(sqlQuery, idUser, film.getId());
+            insertLike(idUser, film.getId());
         }
-
         return true;
+    }
+
+    private void insertLike(long userId, long filmId) {
+        String sqlQuery = "insert into likes(user_id, film_id) values (?, ?)";
+        jdbcTemplate.update(sqlQuery, userId, filmId);
     }
 
     public boolean dislike(Film film) {
-        String sqlQuery = "delete from likes where film_id = ?";
-        jdbcTemplate.update(sqlQuery, film.getId());
+        deleteLikesByFilmId(film.getId());
         return true;
     }
 
-    public List<Long> findLikes(Film film) {
-        String sqlQuery = "select * from likes where film_id = ?";
-        return jdbcTemplate.query(sqlQuery, (rs, rowNum) -> rs.getLong("user_id"), film.getId());
+    private void deleteLikesByFilmId(long filmId) {
+        String sqlQuery = "delete from likes where film_id = ?";
+        jdbcTemplate.update(sqlQuery, filmId);
     }
 
+    public List<Long> findLikes(Film film) {
+        return findLikesByFilmId(film.getId());
+    }
+
+    private List<Long> findLikesByFilmId(long filmId) {
+        String sqlQuery = "select user_id from likes where film_id = ?";
+        return jdbcTemplate.query(sqlQuery, (rs, rowNum) -> rs.getLong("user_id"), filmId);
+    }
 }

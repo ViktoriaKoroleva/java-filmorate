@@ -47,7 +47,7 @@ public class UserService {
     }
 
     public boolean addFriendship(long id, long friendId) {
-        if ((findUserById(id) == null) || (findUserById(friendId) == null)) {
+        if (Objects.isNull(findUserById(id)) || Objects.isNull(findUserById(friendId))) {
             return false;
         }
         User friendRequest = userStorage.findUserById(id).get();
@@ -57,7 +57,7 @@ public class UserService {
     }
 
     public boolean deleteFriendship(long id, long friendId) {
-        if ((findUserById(id) == null) || (findUserById(friendId) == null)) {
+        if (Objects.isNull(findUserById(id)) || Objects.isNull(findUserById(friendId))) {
             return false;
         }
         User friendRequest = userStorage.findUserById(id).get();
