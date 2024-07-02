@@ -1,35 +1,23 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
 
-@Getter
-@Setter
-@ToString
-@EqualsAndHashCode(of = {"id"})
-@Builder
+@Data
 public class User {
-
-    private Integer id;
-
-    private final Set<Integer> friends = new HashSet<>();
-
-    @NotBlank(message = "Электронная почта не может быть пустой.")
-    @Email(message = "Неверный формат электронной почты.")
+    private long id;
+    @NotEmpty
+    @Email
+    @NonNull
     private String email;
-
-    @NotBlank(message = "Логин не может быть пустым.")
-    @Pattern(regexp = "\\S+", message = "Логин не может содержать пробелы")
+    @NonNull
     private String login;
-
     private String name;
-
-    @NotNull(message = "Дата рождения не может быть пустой")
-    @Past(message = "Дата рождения не может быть в будущем.")
+    @NonNull
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate birthday;
 }
 
